@@ -1,113 +1,112 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import Select from 'react-select';
-import './CSS/Project.css'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
+import './CSS/Project.css';
 
 const Project = () => {
-    const [members, setMembers] = useState([]);
-    const [formProject, setFormProject] = useState({
-        project_name: '',
-        project_description: '',
-        project_duration: '',
-        project_member: []
-    });
+    const [projectlist, setProjectList] = useState([]);
+    const [filteredProjects, setFilteredProjects] = useState([]);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
     useEffect(() => {
-        axios.get('http://localhost:3001/member')
+        axios.get('http://localhost:3001/project')
             .then(res => {
-                const memberOptions = res.data.map(member => ({
-                    value: member.member_name,
-                    label: `${member.member_name} (${member.member_role})`
-                }));
-                setMembers(memberOptions);
-            })
-            .catch(err => console.log(err));
-    }, []);
-
-    const handleChange = (selectedOptions) => {
-        setFormProject({
-            ...formProject,
-            project_member: selectedOptions ? selectedOptions.map(option => option.value) : []
-        });
-    };
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        if (!formProject.project_name.trim()) {
-            alert("Project Name is required");
-            return;
-        }
-
-        axios.post('http://localhost:3001/project', {
-            ...formProject,
-            project_member: JSON.stringify(formProject.project_member) // เปลี่ยนเป็นเเบบ JSON
-        })
-            .then(() => {
-                alert('Project created successfully!');
-                navigate('/projects');
+                setProjectList(res.data);
+                setFilteredProjects(res.data);
+                setLoading(false);
             })
             .catch(err => {
-                console.error(err);
-                alert('Failed to create project');
+                console.log(err);
+                setLoading(false);
             });
+    }, []);
+
+    useEffect(() => {
+        if (searchQuery === '') {
+            setFilteredProjects(projectlist);  // ถ้าไม่ได้ค้นหาให้แสดง projectทั้งหมด
+        } else {
+            setFilteredProjects(
+                projectlist.filter(project =>
+                    project.project_name.toLowerCase().includes(searchQuery.toLowerCase())
+                )
+            );
+        }
+    }, [searchQuery, projectlist]);
+
+    const handleUpdateProject = (id) => {
+        navigate(`/UpdateProject/${id}`);
+    };
+
+    const handleDeleteProject = async (id) => {
+        try {
+            await axios.delete(`http://localhost:3001/project/${id}`);
+            setProjectList(projectlist.filter(project => project.project_id !== id));
+        } catch (err) {
+            console.log(err);
+        }
     };
 
     return (
-        <div className="create-project">
-            <h2>Create New Project</h2>
-            <form onSubmit={handleSubmit}>
-                <label>
-                    Project Name:
-                    <input
-                        type="text"
-                        name="project_name"
-                        value={formProject.project_name}
-                        onChange={(e) =>
-                            setFormProject({ ...formProject, project_name: e.target.value })
-                        }
-                    />
-                </label>
-                <label>
-                    Project Description:
-                    <input
-                        type="text"
-                        name="project_description"
-                        value={formProject.project_description}
-                        onChange={(e) =>
-                            setFormProject({ ...formProject, project_description: e.target.value })
-                        }
-                    />
-                </label>
-                <label>
-                    Project Duration:
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                        <input
-                            type="text"
-                            name="project_duration"
-                            value={formProject.project_duration}
-                            onChange={(e) =>
-                                setFormProject({ ...formProject, project_duration: e.target.value })
-                            }
-                            style={{ flex: '1' }}
-                        />
-                        <span style={{ marginLeft: '8px' }}>Days</span>
-                    </div>
-                </label>
-                <label>Select Members:</label>
-                <Select
-                    isMulti
-                    name="project_member"
-                    options={members}
-                    className="select-members"
-                    classNamePrefix="select"
-                    onChange={handleChange}
-                    value={members.filter(member => formProject.project_member.includes(member.value))}
+        <div className='topic-project'>
+            <div className='top-section'>
+                <h1 className='project-title'>Project</h1>
+                <button onClick={() => navigate('/CreateProject')} className='create-project-btn'>Create Project</button>
+            </div>
+            <div className='project-search'>
+                <input
+                    type='text'
+                    className='project-search-input'
+                    placeholder='Search Project'
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
                 />
+                <FontAwesomeIcon icon={faMagnifyingGlass} className='search-icon' />
+            </div>
 
-                <button type="submit">Create Project</button>
-            </form>
+            {loading ? (
+                <p>Loading projects...</p>
+            ) : (
+                <table className='project-table'>
+                    <thead>
+                        <tr>
+                            <th>Project Name</th>
+                            <th>Description</th>
+                            <th>Duration</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {filteredProjects.length === 0 ? (
+                            <tr>
+                                <td colSpan="4">No projects available</td>
+                            </tr>
+                        ) : (
+                            filteredProjects.map((data) => (
+                                <tr key={data.project_id}>
+                                    <td>{data.project_name}</td>
+                                    <td>{data.project_description}</td>
+                                    <td>{data.project_duration} Days</td>
+                                    <td>
+                                        <button
+                                            onClick={() => handleUpdateProject(data.project_id)}
+                                            className='btn btn-primary'
+                                        >
+                                            Update
+                                        </button>
+                                        <button onClick={() => handleDeleteProject(data.project_id)} className='btn btn-danger'>
+                                            Delete
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))
+                        )}
+                    </tbody>
+                </table>
+            )}
         </div>
     );
 };

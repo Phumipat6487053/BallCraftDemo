@@ -1,0 +1,20 @@
+/* Navbar.css */
+.navbar {
+    background-color: #5cb4df;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.navbar-brand a {
+    text-decoration: none;
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #f4f4f4;
+    font-family: 'Poppins', sans-serif;
+    transition: color 0.3s ease;
+}

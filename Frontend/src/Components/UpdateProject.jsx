@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import Select from 'react-select';
-import './CSS/CreateProject.css'
 
-const CreateProject = () => {
+const UpdateProject = () => {
+    const { id } = useParams();
     const [members, setMembers] = useState([]);
-    const [formProject, setFormProject] = useState({
+    const [formEditProject, setFormEditProject] = useState({
         project_name: '',
         project_description: '',
         project_duration: '',
         project_member: []
     });
+    const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -26,46 +27,69 @@ const CreateProject = () => {
             .catch(err => console.log(err));
     }, []);
 
+
+    useEffect(() => {
+        axios.get(`http://localhost:3001/project/${id}`)
+            .then(res => {
+                const projectData = res.data;
+                setFormEditProject({
+                    project_name: projectData.project_name,
+                    project_description: projectData.project_description,
+                    project_duration: projectData.project_duration,
+                    project_member: JSON.parse(projectData.project_member) || []
+                });
+                setLoading(false);
+            })
+            .catch(err => {
+                console.log(err);
+                setLoading(false);
+            });
+    }, [id]);
+
     const handleChange = (selectedOptions) => {
-        setFormProject({
-            ...formProject,
+        setFormEditProject({
+            ...formEditProject,
             project_member: selectedOptions ? selectedOptions.map(option => option.value) : []
         });
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (!formProject.project_name.trim()) {
+        if (!formEditProject.project_name.trim()) {
             alert("Project Name is required");
             return;
         }
 
-        axios.post('http://localhost:3001/project', {
-            ...formProject,
-            project_member: JSON.stringify(formProject.project_member) // เปลี่ยนเป็นเเบบ JSON
+        axios.put(`http://localhost:3001/project/${id}`, {
+            ...formEditProject,
+            project_member: JSON.stringify(formEditProject.project_member)
         })
             .then(() => {
-                alert('Project created successfully!');
+                alert('Project updated successfully!');
                 navigate('/projects');
             })
             .catch(err => {
                 console.error(err);
-                alert('Failed to create project');
+                alert('Failed to update project');
             });
     };
 
+    if (loading) {
+        return <div>Loading...</div>;
+    }
+
     return (
-        <div className="create-project">
-            <h2>Create New Project</h2>
+        <div className="update-project">
+            <h2>Update Project</h2>
             <form onSubmit={handleSubmit}>
                 <label>
                     Project Name:
                     <input
                         type="text"
                         name="project_name"
-                        value={formProject.project_name}
+                        value={formEditProject.project_name}
                         onChange={(e) =>
-                            setFormProject({ ...formProject, project_name: e.target.value })
+                            setFormEditProject({ ...formEditProject, project_name: e.target.value })
                         }
                     />
                 </label>
@@ -74,9 +98,9 @@ const CreateProject = () => {
                     <input
                         type="text"
                         name="project_description"
-                        value={formProject.project_description}
+                        value={formEditProject.project_description}
                         onChange={(e) =>
-                            setFormProject({ ...formProject, project_description: e.target.value })
+                            setFormEditProject({ ...formEditProject, project_description: e.target.value })
                         }
                     />
                 </label>
@@ -86,9 +110,9 @@ const CreateProject = () => {
                         <input
                             type="text"
                             name="project_duration"
-                            value={formProject.project_duration}
+                            value={formEditProject.project_duration}
                             onChange={(e) =>
-                                setFormProject({ ...formProject, project_duration: e.target.value })
+                                setFormEditProject({ ...formEditProject, project_duration: e.target.value })
                             }
                             style={{ flex: '1' }}
                         />
@@ -103,13 +127,12 @@ const CreateProject = () => {
                     className="select-members"
                     classNamePrefix="select"
                     onChange={handleChange}
-                    value={members.filter(member => formProject.project_member.includes(member.value))}
+                    value={members.filter(member => formEditProject.project_member.includes(member.value))}
                 />
-
-                <button type="submit">Create Project</button>
+                <button type="submit">Update Project</button>
             </form>
         </div>
     );
 };
 
-export default CreateProject;
+export default UpdateProject;

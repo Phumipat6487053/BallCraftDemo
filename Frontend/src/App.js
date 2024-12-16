@@ -7,23 +7,19 @@ import CreateProject from './Components/CreateProject';
 import UpdateTestplan from './Components/UpdateTestplan';
 import Requirement from './Components/requirementPage';
 import Project from './Components/Project';
+import Navbar from './Components/Navbar';
+import UpdateProject from './Components/UpdateProject';
 
 const App = () => {
   return (
     <Router>
-      <div style={{ display: 'flex' }}>
-        <Sidebar />
-        <div style={{ marginLeft: '250px', padding: '20px' }}>
-          <Routes>
-            <Route path="/home" element={<Home />} />
-            <Route path="/project" element={<Project />} />
-            <Route path="/test-plans" element={<Testplan />} />
-            <Route path="/CreateProject" element={<CreateProject />} />
-            <Route path="/UpdateTestplan/:id" element={<UpdateTestplan />} />
-            <Route path="requirementPage" element={<Requirement />} />
-          </Routes>
-        </div>
-      </div>
+      <Navbar />
+
+      <Routes>
+        <Route path='/' element={<Project />} />
+        <Route path="/CreateProject" element={<CreateProject />} />
+        <Route path="/UpdateProject/:id" element={<UpdateProject />} />
+      </Routes>
     </Router>
   );
 }

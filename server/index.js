@@ -177,6 +177,39 @@ app.post('/project', (req, res) => {
     });
 });
 
+app.put('/project/:project_id', (req, res) => {
+    const sql = "UPDATE project SET project_name = ?, project_description = ?, project_duration = ?, project_member = ? WHERE project_id = ?";
+    const values = [
+        req.body.project_name,
+        req.body.project_description,
+        req.body.project_duration,
+        req.body.project_member,
+        req.params.project_id
+    ];
+    db.query(sql, values, (err, result) => {
+        if (err) {
+            console.log('Error executing query:', err);
+            return res.status(500).json({ error: "Error updating project" });
+        }
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: "Project not found" });
+        }
+        return res.status(200).json({ message: 'Project updated successfully', data: result });
+    });
+});
+app.delete('/project/:project_id', (req, res) => {
+    const sql = "DELETE FROM project WHERE project_id = ?";
+    const id = req.params.project_id;
+
+    db.query(sql, [id], (err, result) => {
+        if (err) {
+            console.log('Error deleting the Project:', err);
+            return res.status(500).json({ message: "Error deleting the Project" });
+        }
+        return res.status(200).json({ message: "Project deleted successfully" });
+    });
+});
+
 app.get('/member', (req, res) => {
     const sql = 'SELECT member_name,member_role FROM member';
     db.query(sql, (err, results) => {
