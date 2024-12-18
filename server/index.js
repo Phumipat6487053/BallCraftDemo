@@ -3,9 +3,11 @@ const app = express();
 const mysql = require('mysql');
 const cors = require('cors');
 
+// Middleware
 app.use(cors());
 app.use(express.json());
 
+// Database Connection
 const db = mysql.createConnection({
     user: "root",
     host: "localhost",
@@ -13,6 +15,7 @@ const db = mysql.createConnection({
     database: "testcraft"
 });
 
+// Test Database Connection
 db.connect((err) => {
     if (err) {
         console.error('Error connecting to the database:', err.stack);
@@ -21,145 +24,37 @@ db.connect((err) => {
     console.log('Connected to the database as ID', db.threadId);
 });
 
-app.get('/createproject', (req, res) => {
-    db.query("SELECT * FROM createproject", (err, result) => {
-        if (err) {
-            console.log(err);
-            res.status(500).send('Error executing query');
-        } else {
-            res.send(result);
-        }
-    });
-});
-
-app.get('/createproject/:id', (req, res) => {
-    const sql = "SELECT * FROM createproject WHERE ID = ?";
-    const id = req.params.id;
-
-    db.query(sql, [id], (err, result) => {
-        if (err) {
-            console.log(err);
-            res.status(500).send('Error executing query');
-        } else if (result.length > 0) {
-            res.send(result[0]);
-        } else {
-            res.status(404).send('Test Plan not found');
-        }
-    });
-});
-
-app.post('/createproject', (req, res) => {
-    const sql = "INSERT INTO createproject (name, description) VALUES (?, ?)";
-    const values = [
-        req.body.name,
-        req.body.description
-    ];
-    db.query(sql, values, (err, data) => {
-        if (err) {
-            console.log(err);
-            return res.status(500).json("Error");
-        }
-        return res.status(200).json(data);
-    });
-});
-app.put('/createproject/:id', (req, res) => {
-    const sql = "UPDATE createproject SET name = ?, description = ? WHERE ID = ?";
-    const values = [
-        req.body.name,
-        req.body.description,
-        req.params.id
-    ];
-
-    db.query(sql, values, (err, data) => {
-        if (err) {
-            console.log(err);
-            return res.status(500).json({ error: "Error updating data" });
-        }
-        return res.status(200).json(data);
-    });
-});
-
-app.delete('/createproject/:id', (req, res) => {
-    const sql = "DELETE FROM createproject WHERE ID = ?";
-    const id = req.params.id;
-
-    db.query(sql, [id], (err, result) => {
-        if (err) {
-            console.log('Error deleting the Test Plan:', err);
-            return res.status(500).json({ message: "Error deleting the Test Plan" });
-        }
-        return res.status(200).json({ message: "Test Plan deleted successfully" });
-    });
-});
-
-
-// app.put('/createproject/:id', (req, res) => {
-//     const sql = "UPDATE createproject SET name = ?, description = ? WHERE ID = ?";
-//     const values = [
-//         req.body.name,
-//         req.body.description,
-//         req.params.id
-//     ];
-
-
-//     db.query(sql, values, (err, data) => {
-//         if (err) {
-//             console.log('Error executing query:', err);
-//             return res.status(500).json({ message: "Error updating data" });
-//         }
-//         return res.status(200).json(data);
-//     });
-// });
-
-app.get('/requirementlist', (req, res) => {
-    db.query("SELECT * FROM requirementlist", (err, result) => {
-        if (err) {
-            console.log(err);
-            res.status(500).send('Error executing query');
-        } else {
-            res.send(result);
-        }
-    });
-});
-
-app.get('/designdiagram', (req, res) => {
-    db.query("SELECT * FROM designdiagram", (err, result) => {
-        if (err) {
-            console.log(err);
-            res.status(500).send('Error executing query');
-        } else {
-            res.send(result);
-        }
-    });
-});
-
-app.get('/designWithRequirement', (req, res) => {
-    const sql = `
-    SELECT designdiagram.de_id, designdiagram.de_image, requirement.reqName, designdiagram.req_id 
-    FROM designdiagram
-    JOIN requirementlist ON designdiagram.req_id = requirementlist.req_id
-  `;
-
-    db.query(sql, (err, result) => {
-        if (err) {
-            console.log(err);
-            res.status(500).send('Error fetching designs');
-        } else {
-            res.send(result);
-        }
-    });
-});
-
+// ------------------------- PROJECT ROUTES -------------------------
+// Get all projects
 app.get('/project', (req, res) => {
     db.query("SELECT * FROM project", (err, result) => {
         if (err) {
-            console.log(err);
-            res.status(500).send('Error executing query');
+            console.error(err);
+            res.status(500).send('Error fetching projects');
         } else {
             res.send(result);
         }
     });
 });
+
+// Get a project by ID
+app.get('/project/:id', (req, res) => {
+    const sql = "SELECT * FROM project WHERE project_id = ?";
+    const id = req.params.id;
+
+    db.query(sql, [id], (err, result) => {
+        if (err) {
+            console.error(err);
+            res.status(500).send('Error fetching the project');
+        } else if (result.length > 0) {
+            res.send(result[0]);
+        } else {
+            res.status(404).send('Project not found');
+        }
+    });
+});
+
+// Add a new project
 app.post('/project', (req, res) => {
     const sql = "INSERT INTO project (project_name, project_description, project_duration, project_member) VALUES (?, ?, ?, ?)";
     const values = [
@@ -168,57 +63,150 @@ app.post('/project', (req, res) => {
         req.body.project_duration,
         req.body.project_member
     ];
+
     db.query(sql, values, (err, data) => {
         if (err) {
-            console.log(err);
-            return res.status(500).json("Error");
+            console.error(err);
+            return res.status(500).json({ message: "Error adding project" });
         }
-        return res.status(200).json(data);
+        return res.status(200).json({ message: "Project added successfully", data });
     });
 });
 
-app.put('/project/:project_id', (req, res) => {
+// Update an existing project
+app.put('/project/:id', (req, res) => {
     const sql = "UPDATE project SET project_name = ?, project_description = ?, project_duration = ?, project_member = ? WHERE project_id = ?";
     const values = [
         req.body.project_name,
         req.body.project_description,
         req.body.project_duration,
         req.body.project_member,
-        req.params.project_id
+        req.params.id
     ];
-    db.query(sql, values, (err, result) => {
+
+    db.query(sql, values, (err, data) => {
         if (err) {
-            console.log('Error executing query:', err);
-            return res.status(500).json({ error: "Error updating project" });
+            console.error(err);
+            return res.status(500).json({ message: "Error updating project" });
         }
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ error: "Project not found" });
-        }
-        return res.status(200).json({ message: 'Project updated successfully', data: result });
+        return res.status(200).json({ message: "Project updated successfully", data });
     });
 });
-app.delete('/project/:project_id', (req, res) => {
-    const sql = "DELETE FROM project WHERE project_id = ?";
-    const id = req.params.project_id;
 
-    db.query(sql, [id], (err, result) => {
+// Delete a project
+app.delete('/project/:id', (req, res) => {
+    const sql = "DELETE FROM project WHERE project_id = ?";
+    const id = req.params.id;
+
+    db.query(sql, [id], (err, data) => {
         if (err) {
-            console.log('Error deleting the Project:', err);
-            return res.status(500).json({ message: "Error deleting the Project" });
+            console.error('Error deleting project:', err);
+            return res.status(500).json({ message: "Error deleting project" });
         }
         return res.status(200).json({ message: "Project deleted successfully" });
     });
 });
 
+// ------------------------- MEMBER ROUTES -------------------------
+// Get all members
 app.get('/member', (req, res) => {
-    const sql = 'SELECT member_name,member_role FROM member';
+    const sql = 'SELECT member_name, member_role FROM member';
     db.query(sql, (err, results) => {
-        if (err) throw err;
-        res.json(results);
+        if (err) {
+            console.error(err);
+            res.status(500).send('Error fetching members');
+        } else {
+            res.json(results);
+        }
     });
 });
 
+// ------------------------- REQUIREMENT ROUTES -------------------------
 
-app.listen(3001, () => {
-    console.log('Server is running on port 3001');
+// Get all requirements
+app.get('/requirement', (req, res) => {
+    const sql = "SELECT * FROM requirement";
+    db.query(sql, (err, results) => {
+        if (err) {
+            console.error(err);
+            res.status(500).send("Error fetching requirements");
+        } else {
+            res.json(results);
+        }
+    });
+});
+
+// Get a requirement by ID
+app.get('/requirement/:id', (req, res) => {
+    const sql = "SELECT * FROM requirement WHERE requirement_id = ?";
+    const id = req.params.id;
+
+    db.query(sql, [id], (err, result) => {
+        if (err) {
+            console.error(err);
+            res.status(500).send("Error fetching the requirement");
+        } else if (result.length > 0) {
+            res.json(result[0]);
+        } else {
+            res.status(404).send("Requirement not found");
+        }
+    });
+});
+
+// Add a new requirement
+app.post('/requirement', (req, res) => {
+    const sql = "INSERT INTO requirement (requirement_name, requirement_description, requirement_type, ) VALUES (?, ?, ?)";
+    const values = [
+        req.body.requirement_name,
+        req.body.requirement_description,
+        req.body.requirement_type
+
+    ];
+
+    db.query(sql, values, (err, data) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ message: "Error adding requirement" });
+        }
+        return res.status(200).json({ message: "Requirement added successfully", data });
+    });
+});
+
+// Update an existing requirement
+app.put('/requirement/:id', (req, res) => {
+    const sql = "UPDATE requirement SET requirement_name = ?, requirement_description =? , requirement_type = ?, WHERE requirement_id = ?";
+    const values = [
+        req.body.requirement_name,
+        req.body.requirement_description,
+        req.body.requirement_type,
+        req.params.id
+    ];
+
+    db.query(sql, values, (err, data) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ message: "Error updating requirement" });
+        }
+        return res.status(200).json({ message: "Requirement updated successfully", data });
+    });
+});
+
+// Delete a requirement
+app.delete('/requirement/:id', (req, res) => {
+    const sql = "DELETE FROM requirement WHERE requirement_id = ?";
+    const id = req.params.id;
+
+    db.query(sql, [id], (err, data) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ message: "Error deleting requirement" });
+        }
+        return res.status(200).json({ message: "Requirement deleted successfully" });
+    });
+});
+
+// ------------------------- SERVER LISTENER -------------------------
+const PORT = 3001;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
 });

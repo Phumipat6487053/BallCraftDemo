@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import Select from 'react-select';
+import './CSS/UpdateProject.css';
 
 const UpdateProject = () => {
-    const { id } = useParams();
-    const [members, setMembers] = useState([]);
+    const { id } = useParams(); // ดึง project id จาก URL
+    const [members, setMembers] = useState([]); // รายการสมาชิกที่ใช้แสดงใน dropdown
     const [formEditProject, setFormEditProject] = useState({
         project_name: '',
         project_description: '',
@@ -15,22 +16,11 @@ const UpdateProject = () => {
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
+    // ดึงข้อมูลโปรเจกต์ที่มีอยู่จาก API
     useEffect(() => {
-        axios.get('http://localhost:3001/member')
-            .then(res => {
-                const memberOptions = res.data.map(member => ({
-                    value: member.member_name,
-                    label: `${member.member_name} (${member.member_role})`
-                }));
-                setMembers(memberOptions);
-            })
-            .catch(err => console.log(err));
-    }, []);
-
-
-    useEffect(() => {
-        axios.get(`http://localhost:3001/project/${id}`)
-            .then(res => {
+        axios
+            .get(`http://localhost:3001/project/${id}`)
+            .then((res) => {
                 const projectData = res.data;
                 setFormEditProject({
                     project_name: projectData.project_name,
@@ -40,40 +30,59 @@ const UpdateProject = () => {
                 });
                 setLoading(false);
             })
-            .catch(err => {
-                console.log(err);
+            .catch((err) => {
+                console.log('Error fetching project data:', err);
                 setLoading(false);
             });
     }, [id]);
 
+    // ดึงข้อมูลสมาชิกจาก API เพื่อนำไปแสดงใน dropdown
+    useEffect(() => {
+        axios
+            .get('http://localhost:3001/member')
+            .then((res) => {
+                const memberOptions = res.data.map((member) => ({
+                    value: member.member_name,
+                    label: `${member.member_name} (${member.member_role})`
+                }));
+                setMembers(memberOptions);
+            })
+            .catch((err) => console.log('Error fetching members:', err));
+    }, []);
+
+    // ฟังก์ชันสำหรับอัปเดตค่า state เมื่อแก้ไข input field
     const handleChange = (selectedOptions) => {
         setFormEditProject({
             ...formEditProject,
-            project_member: selectedOptions ? selectedOptions.map(option => option.value) : []
+            project_member: selectedOptions ? selectedOptions.map((option) => option.value) : []
         });
     };
 
+    // ฟังก์ชันสำหรับส่งข้อมูลที่แก้ไขกลับไปยัง backend
     const handleSubmit = (e) => {
         e.preventDefault();
+
         if (!formEditProject.project_name.trim()) {
-            alert("Project Name is required");
+            alert('Project Name is required');
             return;
         }
 
-        axios.put(`http://localhost:3001/project/${id}`, {
-            ...formEditProject,
-            project_member: JSON.stringify(formEditProject.project_member)
-        })
+        axios
+            .put(`http://localhost:3001/project/${id}`, {
+                ...formEditProject,
+                project_member: JSON.stringify(formEditProject.project_member)
+            })
             .then(() => {
                 alert('Project updated successfully!');
-                navigate('/projects');
+                navigate('/'); // กลับไปที่หน้ารายการโปรเจกต์
             })
-            .catch(err => {
-                console.error(err);
+            .catch((err) => {
+                console.error('Error updating project:', err);
                 alert('Failed to update project');
             });
     };
 
+    // แสดงสถานะ Loading ระหว่างดึงข้อมูล
     if (loading) {
         return <div>Loading...</div>;
     }
@@ -106,18 +115,15 @@ const UpdateProject = () => {
                 </label>
                 <label>
                     Project Duration:
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                        <input
-                            type="text"
-                            name="project_duration"
-                            value={formEditProject.project_duration}
-                            onChange={(e) =>
-                                setFormEditProject({ ...formEditProject, project_duration: e.target.value })
-                            }
-                            style={{ flex: '1' }}
-                        />
-                        <span style={{ marginLeft: '8px' }}>Days</span>
-                    </div>
+                    <input
+                        type="number"
+                        name="project_duration"
+                        value={formEditProject.project_duration}
+                        onChange={(e) =>
+                            setFormEditProject({ ...formEditProject, project_duration: e.target.value })
+                        }
+                    />
+                    <span>Days</span>
                 </label>
                 <label>Select Members:</label>
                 <Select
@@ -127,7 +133,9 @@ const UpdateProject = () => {
                     className="select-members"
                     classNamePrefix="select"
                     onChange={handleChange}
-                    value={members.filter(member => formEditProject.project_member.includes(member.value))}
+                    value={members.filter((member) =>
+                        formEditProject.project_member.includes(member.value)
+                    )}
                 />
                 <button type="submit">Update Project</button>
             </form>

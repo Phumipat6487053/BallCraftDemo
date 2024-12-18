@@ -1,8 +1,7 @@
-/* Project.css */
-.topic-project {
+/* RequirementPage.css */
+.requirement-container {
     margin: 30px 0px 0px 30px;
-    padding: 10px 20px;
-    border-radius: 8px;
+    padding: 20px;
 }
 
 .top-section {
@@ -12,37 +11,41 @@
     margin-bottom: 10px;
 }
 
-.project-title {
+.requirement-title {
     font-size: 2rem;
     color: #333;
     margin: 0;
 }
 
-.create-project-btn {
+.create-requirement-btn {
     padding: 10px 20px;
     font-size: 1rem;
     color: #fff;
-    background-color: #007bff;
+    background-color: #28a745;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
 
-.create-project-btn:hover {
-    background-color: #0056b3;
+.create-requirement-btn:hover {
+    background-color: #218838;
 }
 
-.project-search {
-    position: relative;
+.requirement-search-section {
     margin-top: 30px;
 }
 
-.project-search-input {
+.requirement-search {
+    position: relative;
+    width: 100%;
+    max-width: 500px;
+}
+
+.requirement-search-input {
     padding: 10px;
     font-size: 1rem;
     width: 100%;
-    max-width: 500px;
     border-radius: 5px;
     border: 1px solid #ccc;
     outline: none;
@@ -58,45 +61,40 @@
     font-size: 1.2rem;
 }
 
-.project-search-input:focus {
-    border: 1px solid #007bff;
+.requirement-search-input:focus {
+    border: 1px solid #28a745;
 }
 
-.project-table {
+.requirement-table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 30px;
+    margin-top: 20px;
 }
 
-.project-table th,
-.project-table td {
+.requirement-table th,
+.requirement-table td {
     padding: 10px;
     text-align: left;
     font-size: 1rem;
 }
 
-.project-table th {
+.requirement-table th {
     background-color: #f1f1f1;
     color: #333;
     font-weight: normal;
 }
 
-.project-table td {
+.requirement-table td {
     background-color: white;
     color: #555;
     border-bottom: 1px solid #ddd;
 }
 
-.project-table tr:hover {
+.requirement-table tr:hover {
     background-color: #fafafa;
 }
 
-.project-table .action-buttons {
-    display: flex;
-    gap: 10px;
-}
-
-.project-table .btn {
+.requirement-table .btn {
     padding: 6px 10px;
     font-size: 0.875rem;
     border: none;
@@ -106,8 +104,14 @@
     color: #555;
 }
 
-.project-table .btn:hover {
+.requirement-table .btn:hover {
     background-color: #ddd;
+}
+
+.requirement-table .requirement-name-link {
+    cursor: pointer;
+    color: blue;
+    text-decoration: underline;
 }
 
 .content-container {
@@ -116,22 +120,3 @@
     align-items: flex-start;
     gap: 20px;
 }
-
-.project-section {
-    flex: 1;
-}
-
-.promo-banner {
-    width: 40%;
-    display: flex;
-
-    flex-direction: column; 
-}
-
-.promo-content {
-    background-color: #f9f9f9;
-    border-radius: 5px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    text-align: center;
-}
- 

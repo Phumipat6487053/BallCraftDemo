@@ -46,7 +46,7 @@ const CreateProject = () => {
         })
             .then(() => {
                 alert('Project created successfully!');
-                navigate('/projects');
+                navigate('/');
             })
             .catch(err => {
                 console.error(err);
