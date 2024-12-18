@@ -1,5 +1,6 @@
 /* General page styling */
-body, html {
+body,
+html {
   margin: 0;
   padding: 0;
   font-family: Arial, sans-serif;
@@ -11,7 +12,7 @@ body, html {
   height: 100vh;
 }
 
-/* Navbar styling */
+
 .navbar2 {
   background-color: #4c6580;
   padding: 20px;
@@ -35,7 +36,8 @@ body, html {
   color: white;
   text-decoration: none;
   font-size: 18px;
-  margin-bottom: 10px; /* เพิ่มช่องว่าง */
+  margin-bottom: 10px;
+  /* เพิ่มช่องว่าง */
   cursor: pointer;
   position: relative;
   transition: color 0.3s ease, transform 0.3s ease;
@@ -43,7 +45,7 @@ body, html {
 }
 
 .nav-link:hover {
-  color: #ff9800;
+
   transform: translateX(5px);
 }
 
@@ -60,6 +62,7 @@ body, html {
     opacity: 0;
     transform: translateY(-10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -71,6 +74,7 @@ body, html {
     opacity: 0;
     transform: translateY(-20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -78,13 +82,16 @@ body, html {
 }
 
 .dropdown-container {
-  position: relative; /* Anchor สำหรับ dropdown */
-  z-index: 10; /* Ensure dropdown is above other elements */
+  position: relative;
+  /* Anchor สำหรับ dropdown */
+  z-index: 10;
+  /* Ensure dropdown is above other elements */
 }
 
 .dropdown-menu {
   position: absolute;
-  top: 100%; /* แสดง dropdown ด้านล่าง */
+  top: 100%;
+  /* แสดง dropdown ด้านล่าง */
   left: 0;
   background-color: #3b4a5a;
   border: 1px solid #ccc;
@@ -92,7 +99,8 @@ body, html {
   display: none;
   flex-direction: column;
   z-index: 999;
-  animation: slideDown 0.3s ease-out; /* ใส่ animation ให้ dropdown */
+  animation: slideDown 0.3s ease-out;
+  /* ใส่ animation ให้ dropdown */
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
   border-radius: 5px;
 }
@@ -131,8 +139,10 @@ body, html {
   flex: 1;
   padding: 20px;
   background-color: #f9f9f9;
-  overflow-y: auto; /* ป้องกันการล้นใน content */
-  position: relative; /* Fix z-index issues */
+  overflow-y: auto;
+  /* ป้องกันการล้นใน content */
+  position: relative;
+  /* Fix z-index issues */
 }
 
 h2 {
@@ -168,9 +178,10 @@ h2 {
     justify-content: space-between;
     padding: 10px;
   }
-  
+
   .dropdown-menu {
-    width: 100%; /* แสดง dropdown เต็มความกว้าง */
+    width: 100%;
+    /* แสดง dropdown เต็มความกว้าง */
   }
 
   .content-container {
@@ -181,4 +192,54 @@ h2 {
     margin: 0 5px;
     font-size: 16px;
   }
+}
+
+.dashboard-container {
+  display: flex;
+  height: 100vh;
+  background-color: #1e3a56;
+  color: #fff;
+}
+
+.sidebar {
+  width: 170px;
+  background-color: #1e3a56;
+  padding: 20px;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar-project-name {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.sidebar-section-title {
+  font-size: 14px;
+  font-weight: bold;
+  margin-top: 20px;
+  margin-bottom: 10px;
+  color: #aaa;
+}
+
+.nav-link {
+  padding: 10px;
+  cursor: pointer;
+  font-size: 16px;
+  color: #fff;
+  transition: background 0.2s;
+}
+
+.nav-link:hover,
+.nav-link.active {
+  background-color: #357ab7;
+  border-radius: 5px;
+}
+
+.content-container {
+  flex-grow: 1;
+  padding: 20px;
+  background-color: #f5f5f5;
+  color: #000;
+  overflow-y: auto;
 }

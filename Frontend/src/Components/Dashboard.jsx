@@ -1,14 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
-import RequirementPage from './RequirementPage';
+import { Link, useLocation } from 'react-router-dom';
 import './CSS/Dashboard.css';
+import RequirementPage from './RequirementPage';
 
 const Dashboard = () => {
   const location = useLocation();
-
-  const [showDropdown, setShowDropdown] = useState(false); // State to toggle Work Product dropdown
-  const [showOverviewDropdown, setShowOverviewDropdown] = useState(false); // State to toggle Overview dropdown
-  const [selectedSection, setSelectedSection] = useState(localStorage.getItem('selectedSection') || 'Dashboard');
+  const [selectedSection, setSelectedSection] = useState(localStorage.getItem('selectedSection') || 'Overview');
 
   const queryParams = new URLSearchParams(location.search);
   const projectName = queryParams.get('project');
@@ -17,97 +14,94 @@ const Dashboard = () => {
     localStorage.setItem('selectedSection', selectedSection);
   }, [selectedSection]);
 
-  // Toggle for Work Product dropdown
-  const handleDropdownToggle = () => {
-    setShowDropdown((prev) => !prev);
-    setShowOverviewDropdown(false); // Close Overview dropdown when Work Product dropdown opens
-  };
-
-  // Toggle for Overview dropdown
-  const handleOverviewDropdownToggle = () => {
-    setShowOverviewDropdown((prev) => !prev);
-    setShowDropdown(false); // Close Work Product dropdown when Overview dropdown opens
-  };
-
-  // Handle dropdown item click
-  const handleDropdownItemClick = (section) => {
-    setSelectedSection(section);
-    setShowDropdown(false); // Close dropdown after selecting
-    setShowOverviewDropdown(false); // Close Overview dropdown after selecting
-  };
-
   return (
     <div className="dashboard-container">
-      {/* Navbar */}
-      <nav className="navbar2">
-        {projectName && <div className="nav-project-name">{projectName}</div>}
+      {/* Sidebar */}
+      <nav className="sidebar">
+        {/* Project Name */}
+        {projectName && <div className="sidebar-project-name">{projectName}</div>}
 
+        {/* Project Section */}
+        <div className="sidebar-section-title">PROJECT</div>
         <div
-          className={`nav-link ${selectedSection === 'Project' ? 'active' : ''}`}
-          onClick={() => setSelectedSection('Project')}
-        >
-          Project
-        </div>
-
-        {/* Overview Dropdown */}
-        <div
-          className={`nav-link dropdown-container ${showOverviewDropdown ? 'open' : ''}`}
-          onClick={handleOverviewDropdownToggle}
+          className={`nav-link ${selectedSection === 'Overview' ? 'active' : ''}`}
+          onClick={() => setSelectedSection('Overview')}
         >
           Overview
-          {showOverviewDropdown && (
-            <div className="dropdown-menu overview-dropdown">
-              <div
-                className={`dropdown-item ${selectedSection === 'Dashboard' ? 'active' : ''}`}
-                onClick={() => handleDropdownItemClick('Dashboard')}
-              >
-                Dashboard
-              </div>
-              <div
-                className={`dropdown-item ${selectedSection === 'Guide' ? 'active' : ''}`}
-                onClick={() => handleDropdownItemClick('Guide')}
-              >
-                Guide
-              </div>
-            </div>
-          )}
+        </div>
+        <div
+          className={`nav-link ${selectedSection === 'Documentation' ? 'active' : ''}`}
+          onClick={() => setSelectedSection('Documentation')}
+        >
+          Documentation
         </div>
 
-        {/* Work Product Dropdown */}
+        {/* Management Section */}
+        <div className="sidebar-section-title">WORK PRODUCT</div>
         <div
-          className={`nav-link dropdown-container ${showDropdown ? 'open' : ''}`}
-          onClick={handleDropdownToggle}
+          className={`nav-link ${selectedSection === 'Requirement' ? 'active' : ''}`}
+          onClick={() => setSelectedSection('Requirement')}
         >
-          Work Product
-          {showDropdown && (
-            <div className="dropdown-menu workproduct-dropdown">
-              {['Requirement', 'Design', 'Implementation', 'Testcase', 'Review', 'Baseline', 'Traceability'].map((section) => (
-                <div
-                  key={section}
-                  className={`dropdown-item ${selectedSection === section ? 'active' : ''}`}
-                  onClick={() => handleDropdownItemClick(section)}
-                >
-                  {section}
-                </div>
-              ))}
-            </div>
-          )}
+          Requirement
+        </div>
+        <div
+          className={`nav-link ${selectedSection === 'Design' ? 'active' : ''}`}
+          onClick={() => setSelectedSection('Design')}
+        >
+          Design
+        </div>
+        <div
+          className={`nav-link ${selectedSection === 'Implementation' ? 'active' : ''}`}
+          onClick={() => setSelectedSection('Implementation')}
+        >
+          Implementation
+        </div>
+        <div
+          className={`nav-link ${selectedSection === 'Test case' ? 'active' : ''}`}
+          onClick={() => setSelectedSection('Testcase')}
+        >
+          Test case
+        </div>
+        <div
+          className={`nav-link ${selectedSection === 'Review' ? 'active' : ''}`}
+          onClick={() => setSelectedSection('Review')}
+        >
+          Review
+        </div>
+        <div
+          className={`nav-link ${selectedSection === 'Baseline' ? 'active' : ''}`}
+          onClick={() => setSelectedSection('Baseline')}
+        >
+          Baseline
+        </div>
+        <div
+          className={`nav-link ${selectedSection === 'Traceability' ? 'active' : ''}`}
+          onClick={() => setSelectedSection('Traceability')}
+        >
+          Traceability
+        </div>
+
+        {/* Automation Section */}
+        <div className="sidebar-section-title">GUIDES</div>
+        <div
+          className={`nav-link ${selectedSection === 'Guide Tutorial' ? 'active' : ''}`}
+          onClick={() => setSelectedSection('Guide Tutorial')}
+        >
+          Guide Tutorial
         </div>
       </nav>
 
       {/* Main Content Section */}
       <div className="content-container">
-        {selectedSection === 'Project' && <h2>Project Information</h2>}
-        {selectedSection === 'Overview' && <h2>Project Overview</h2>}
-        {selectedSection === 'Dashboard' && <h2>Dashboard Overview</h2>}
-        {selectedSection === 'Guide' && <h2>Guide Content</h2>}
+        {selectedSection === 'Overview' && <h2>Overview Content</h2>}
+        {selectedSection === 'Documentation' && <h2>Documentation Content</h2>}
         {selectedSection === 'Requirement' && <RequirementPage />}
-        {selectedSection === 'Design' && <div>Design Section Content</div>}
-        {selectedSection === 'Implementation' && <div>Implementation Artifact</div>}
-        {selectedSection === 'Testcase' && <div>Testcase Content</div>}
-        {selectedSection === 'Review' && <div>Review Content</div>}
-        {selectedSection === 'Baseline' && <div>Baseline Content</div>}
-        {selectedSection === 'Traceability' && <div>Traceability Content</div>}
+        {selectedSection === 'Design' && <h2>Design</h2>}
+        {selectedSection === 'Implementation' && <h2>Implementation</h2>}
+        {selectedSection === 'Testcase' && <h2>Test case</h2>}
+        {selectedSection === 'Review' && <h2>Review</h2>}
+        {selectedSection === 'Baseline' && <h2>Baseline</h2>}
+        {selectedSection === 'Traceability' && <h2>Traceability</h2>}
       </div>
     </div>
   );

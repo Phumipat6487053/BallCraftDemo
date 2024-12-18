@@ -8,6 +8,7 @@ import Project from './Components/Project';
 import Navbar from './Components/Navbar';
 import Dashboard from './Components/Dashboard';
 import UpdateProject from './Components/UpdateProject';
+import Home from './Components/Home';
 
 const App = () => {
   return (
@@ -16,9 +17,10 @@ const App = () => {
 
       <Routes>
         {/* Route for Project listing */}
-        <Route path="/" element={<Project />} />
+        <Route path="/" element={<Home />} />
 
         {/* Routes for Project management */}
+        <Route path="/Project" element={<Project />} />
         <Route path="/CreateProject" element={<CreateProject />} />
         <Route path="/UpdateProject/:id" element={<UpdateProject />} />
 

@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 
 const CreateRequirement = () => {
   const [requirementStatement, setRequirementStatement] = useState('');
-  const [requirementType, setRequirementType] = useState('Functional');
+  const [requirementType, setRequirementType] = useState('');
   const [description, setDescription] = useState('');
   const navigate = useNavigate();
 
@@ -14,9 +14,10 @@ const CreateRequirement = () => {
 
     const newRequirement = {
       requirement_name: requirementStatement,
-      type: requirementType,
-      description,
+      requirement_type: requirementType,
+      requirement_description: description
     };
+
 
     try {
       const response = await axios.post('http://localhost:3001/requirement', newRequirement);
@@ -53,6 +54,7 @@ const CreateRequirement = () => {
             value={requirementType}
             onChange={(e) => setRequirementType(e.target.value)}
           >
+            <option value="" disabled>Select Type</option>
             <option value="Functional">Functional</option>
             <option value="Non-Functional">Non-Functional</option>
           </select>
@@ -69,9 +71,6 @@ const CreateRequirement = () => {
           ></textarea>
         </div>
         <div className="form-buttons">
-          <button type="submit" className="btn btn-primary">
-            Create
-          </button>
           <button
             type="button"
             className="btn btn-back"
@@ -79,6 +78,10 @@ const CreateRequirement = () => {
           >
             Back to Dashboard
           </button>
+          <button type="submit" className="btn btn-primary">
+            Create
+          </button>
+
         </div>
       </form>
     </div>

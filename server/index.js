@@ -155,12 +155,11 @@ app.get('/requirement/:id', (req, res) => {
 
 // Add a new requirement
 app.post('/requirement', (req, res) => {
-    const sql = "INSERT INTO requirement (requirement_name, requirement_description, requirement_type, ) VALUES (?, ?, ?)";
+    const sql = "INSERT INTO requirement (requirement_name, requirement_type, requirement_description) VALUES (?, ?, ?)";
     const values = [
         req.body.requirement_name,
-        req.body.requirement_description,
-        req.body.requirement_type
-
+        req.body.requirement_type,
+        req.body.requirement_description
     ];
 
     db.query(sql, values, (err, data) => {
@@ -172,13 +171,14 @@ app.post('/requirement', (req, res) => {
     });
 });
 
+
 // Update an existing requirement
 app.put('/requirement/:id', (req, res) => {
     const sql = "UPDATE requirement SET requirement_name = ?, requirement_description =? , requirement_type = ?, WHERE requirement_id = ?";
     const values = [
         req.body.requirement_name,
-        req.body.requirement_description,
         req.body.requirement_type,
+        req.body.requirement_description,
         req.params.id
     ];
 
@@ -204,6 +204,80 @@ app.delete('/requirement/:id', (req, res) => {
         return res.status(200).json({ message: "Requirement deleted successfully" });
     });
 });
+
+app.get('/project/:id/requirements', (req, res) => {
+    const sql = `
+        SELECT 
+            r.requirement_id,
+            r.requirement_name,
+            r.requirement_type,
+            r.requirement_description,
+            p.project_name
+        FROM requirement r
+        INNER JOIN project p ON r.project_id = p.project_id
+        WHERE r.project_id = ?
+    `;
+    const projectId = req.params.id;
+
+    db.query(sql, [projectId], (err, results) => {
+        if (err) {
+            console.error(err);
+            res.status(500).send('Error fetching requirements');
+        } else {
+            res.json(results);
+        }
+    });
+});
+app.get('/projects-with-requirements', (req, res) => {
+    const sql = `
+        SELECT 
+            p.project_id,
+            p.project_name,
+            r.requirement_id,
+            r.requirement_name,
+            r.requirement_type,
+            r.requirement_description
+        FROM project p
+        LEFT JOIN requirement r ON p.project_id = r.project_id
+    `;
+
+    db.query(sql, (err, results) => {
+        if (err) {
+            console.error(err);
+            res.status(500).send('Error fetching projects with requirements');
+        } else {
+            // Group data by project
+            const groupedData = results.reduce((acc, row) => {
+                const { project_id, project_name, requirement_id, requirement_name, requirement_type, requirement_description } = row;
+
+                if (!acc[project_id]) {
+                    acc[project_id] = {
+                        project_id,
+                        project_name,
+                        requirements: []
+                    };
+                }
+
+                if (requirement_id) {
+                    acc[project_id].requirements.push({
+                        requirement_id,
+                        requirement_name,
+                        requirement_type,
+                        requirement_description
+                    });
+                }
+
+                return acc;
+            }, {});
+
+            res.json(Object.values(groupedData));
+        }
+    });
+});
+
+
+
+
 
 // ------------------------- SERVER LISTENER -------------------------
 const PORT = 3001;

@@ -21,16 +21,17 @@
 .create-project-btn {
     padding: 10px 20px;
     font-size: 1rem;
-    color: #fff;
-    background-color: #007bff;
-    border: none;
+    color: #008767;
+    background-color: #16C09861;
+    border: #00B087;
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
 
 .create-project-btn:hover {
-    background-color: #0056b3;
+    background-color: #054b28;
+    color: whitesmoke;
 }
 
 .project-search {
@@ -121,17 +122,32 @@
     flex: 1;
 }
 
-.promo-banner {
-    width: 40%;
-    display: flex;
-
-    flex-direction: column; 
+.project-name-link {
+    cursor: pointer;
 }
 
-.promo-content {
-    background-color: #f9f9f9;
-    border-radius: 5px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    text-align: center;
+.project-name-link:hover {
+    color: grey;
 }
- 
+
+button {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+}
+
+button:focus {
+    outline: none;
+}
+
+.trash-icon {
+    padding-left: 10px;
+    font-size: 20px;
+    color: #ff4d4d;
+}
+
+.edit-icon {
+    font-size: 20px;
+    color: #0061FF;
+}

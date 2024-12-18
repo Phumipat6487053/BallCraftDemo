@@ -2,9 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
-import logo from '../image/testcraft-logo.png';
-
+import { faMagnifyingGlass, faPenToSquare, faTrash } from '@fortawesome/free-solid-svg-icons';
 import './CSS/Project.css';
 
 const Project = () => {
@@ -60,7 +58,7 @@ const Project = () => {
     return (
         <div className="topic-project">
             <div className="top-section">
-                <h1 className="project-title">Project</h1>
+                <h1 className="project-title">Project Information</h1>
                 <button onClick={() => navigate('/CreateProject')} className="create-project-btn">
                     Create Project
                 </button>
@@ -102,7 +100,6 @@ const Project = () => {
                                             <td
                                                 className="project-name-link"
                                                 onClick={() => handleNavigateToDashboard(data.project_name)}
-                                                style={{ cursor: 'pointer', color: 'blue', textDecoration: 'underline' }}
                                             >
                                                 {data.project_name}
                                             </td>
@@ -111,15 +108,15 @@ const Project = () => {
                                             <td>
                                                 <button
                                                     onClick={() => handleUpdateProject(data.project_id)}
-                                                    className="btn btn-primary"
+                                                    className="editproject-button"
                                                 >
-                                                    Update
+                                                    <FontAwesomeIcon icon={faPenToSquare} className="edit-icon" />
                                                 </button>
                                                 <button
                                                     onClick={() => handleDeleteProject(data.project_id)}
-                                                    className="btn btn-danger"
-                                                >
-                                                    Delete
+                                                    className="deleteproject-button"
+                                                > <FontAwesomeIcon icon={faTrash} className="trash-icon" />
+
                                                 </button>
                                             </td>
                                         </tr>
@@ -128,20 +125,6 @@ const Project = () => {
                             </tbody>
                         </table>
                     )}
-                </div>
-
-                <div className="topic-project">
-                    <div className="promo-banner">
-                        <img src={logo} alt="TestCraft Logo" className="promo-image" />
-                        <div className="promo-content">
-                            <h2>Welcome to TestCraft</h2>
-                            <p>Your all-in-one project management and testing tool, ISO/IEC 29110 compliant.</p>
-                            <p>
-                                Streamline project, requirement, design, and test case management with seamless
-                                traceability and collaboration.
-                            </p>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>

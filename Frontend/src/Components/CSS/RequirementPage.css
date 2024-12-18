@@ -2,6 +2,7 @@
 .requirement-container {
     margin: 30px 0px 0px 30px;
     padding: 20px;
+    width: 100%;
 }
 
 .top-section {
@@ -17,19 +18,20 @@
     margin: 0;
 }
 
-.create-requirement-btn {
+.create-requirement-button {
     padding: 10px 20px;
     font-size: 1rem;
-    color: #fff;
-    background-color: #28a745;
-    border: none;
+    color: #008767;
+    background-color: #16C09861;
+    border: #00B087;
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
 
-.create-requirement-btn:hover {
-    background-color: #218838;
+.create-requirement-button:hover {
+    background-color: #054b28;
+    color: whitesmoke;
 }
 
 .requirement-search-section {
@@ -66,7 +68,7 @@
 }
 
 .requirement-table {
-    width: 100%;
+    width: 260%;
     border-collapse: collapse;
     margin-top: 20px;
 }
@@ -110,8 +112,10 @@
 
 .requirement-table .requirement-name-link {
     cursor: pointer;
-    color: blue;
-    text-decoration: underline;
+}
+
+.requirement-table .requirement-name-link:hover {
+    color: gray;
 }
 
 .content-container {

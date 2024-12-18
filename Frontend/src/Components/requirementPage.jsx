@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
+import { faMagnifyingGlass, faPenToSquare, faTrash } from '@fortawesome/free-solid-svg-icons';
 import './CSS/RequirementPage.css';
 
 const RequirementPage = () => {
@@ -63,7 +63,7 @@ const RequirementPage = () => {
     <div className="requirement-container">
       <div className="top-section">
         <h1 className="requirement-title">Requirements</h1>
-        <button onClick={() => navigate('/CreateRequirement')} className="create-requirement-btn">
+        <button onClick={() => navigate('/CreateRequirement')} className="create-requirement-button">
           Create Requirement
         </button>
       </div>
@@ -104,7 +104,6 @@ const RequirementPage = () => {
                       <td
                         className="requirement-name-link"
                         onClick={() => handleNavigateToDetail(data.requirement_id)}
-                        style={{ cursor: 'pointer', color: 'blue', textDecoration: 'underline' }}
                       >
                         {data.requirement_name}
                       </td>
@@ -113,15 +112,15 @@ const RequirementPage = () => {
                       <td>
                         <button
                           onClick={() => navigate(`/UpdateRequirement/${data.requirement_id}`)}
-                          className="btn btn-primary"
+                          className="edit-req"
                         >
-                          Update
+                          <FontAwesomeIcon icon={faPenToSquare} className="edit-icon" />
                         </button>
                         <button
                           onClick={() => handleDelete(data.requirement_id)}
-                          className="btn btn-danger"
+                          className="delete-req"
                         >
-                          Delete
+                          <FontAwesomeIcon icon={faTrash} className="trash-icon" />
                         </button>
                       </td>
                     </tr>

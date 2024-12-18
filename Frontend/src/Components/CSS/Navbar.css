@@ -1,13 +1,10 @@
-/* Navbar.css */
 .navbar {
     background-color: #85B5CC;
     display: flex;
-    height: 60px;
+    height: 45px;
     justify-content: space-between;
     align-items: center;
     position: sticky;
-    top: 0;
-    z-index: 1000;
 
 }
 
@@ -21,6 +18,7 @@
 
 .logo {
     width: 200px;
-    height: auto;
+    height: 100px;
     padding-left: 10px;
+    margin-bottom: 6.5px;
 }

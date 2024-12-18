@@ -7,8 +7,8 @@ const UpdateRequirement = () => {
   const { id } = useParams(); // Retrieve requirement ID from URL
   const [requirementData, setRequirementData] = useState({
     requirement_name: '',
-    type: 'Functional',
-    description: '',
+    requirement_type: '',
+    requirement_description: '',
   });
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -20,8 +20,8 @@ const UpdateRequirement = () => {
       .then((res) => {
         setRequirementData({
           requirement_name: res.data.requirement_name,
-          type: res.data.type,
-          description: res.data.description,
+          requirement_type: res.data.requirement_type,
+          requirement_description: res.data.requirement_description
         });
         setLoading(false);
       })
@@ -85,7 +85,7 @@ const UpdateRequirement = () => {
           <select
             id="type"
             name="type"
-            value={requirementData.type}
+            value={requirementData.requirement_type}
             onChange={handleChange}
           >
             <option value="Functional">Functional</option>
@@ -97,7 +97,7 @@ const UpdateRequirement = () => {
           <textarea
             id="description"
             name="description"
-            value={requirementData.description}
+            value={requirementData.requirement_description}
             onChange={handleChange}
             placeholder="Enter requirement description"
             rows="4"
