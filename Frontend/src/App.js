@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import CreateProject from './Components/CreateProject';
 import CreateRequirement from './Components/CreateRequirement';
-import RequirementPage from './Components/RequirementPage';
+import RequirementPage from './Components/requirementPage';
 import UpdateRequirement from './Components/UpdateRequirement';
 import Project from './Components/Project';
 import Navbar from './Components/Navbar';
@@ -28,7 +28,7 @@ const App = () => {
         <Route path="/Dashboard" element={<Dashboard />} />
 
         {/* Routes for Requirements */}
-        <Route path="/RequirementPage" element={<RequirementPage />} />
+        <Route path="/requirementPage" element={<RequirementPage />} />
         <Route path="/CreateRequirement" element={<CreateRequirement />} />
         <Route path="/UpdateRequirement/:id" element={<UpdateRequirement />} />
       </Routes>

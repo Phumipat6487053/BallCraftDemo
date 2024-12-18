@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import './CSS/Dashboard.css';
-import RequirementPage from './RequirementPage';
+import RequirementPage from './requirementPage';
 
 const Dashboard = () => {
   const location = useLocation();
