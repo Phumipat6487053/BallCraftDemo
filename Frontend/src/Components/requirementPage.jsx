@@ -134,4 +134,5 @@ const RequirementPage = () => {
     </div>
   );
 };
+
 export default RequirementPage;
