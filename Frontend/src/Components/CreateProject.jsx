@@ -2,54 +2,67 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Select from 'react-select';
-import './CSS/CreateProject.css'
+import './CSS/CreateProject.css';
 
 const CreateProject = () => {
     const [members, setMembers] = useState([]);
     const [formProject, setFormProject] = useState({
         project_name: '',
         project_description: '',
-        project_duration: '',
-        project_member: []
+        start_date: '',
+        end_date: '',
+        project_member: [],
     });
     const navigate = useNavigate();
 
     useEffect(() => {
         axios.get('http://localhost:3001/member')
-            .then(res => {
-                const memberOptions = res.data.map(member => ({
+            .then((res) => {
+                const memberOptions = res.data.map((member) => ({
                     value: member.member_name,
-                    label: `${member.member_name} (${member.member_role})`
+                    label: `${member.member_name} (${member.member_role})`,
                 }));
                 setMembers(memberOptions);
             })
-            .catch(err => console.log(err));
+            .catch((err) => console.log('Error fetching members:', err));
     }, []);
+
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
+    };
 
     const handleChange = (selectedOptions) => {
         setFormProject({
             ...formProject,
-            project_member: selectedOptions ? selectedOptions.map(option => option.value) : []
+            project_member: selectedOptions ? selectedOptions.map((option) => option.value) : [],
         });
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (!formProject.project_name.trim()) {
-            alert("Project Name is required");
+        if (!formProject.project_name.trim() || !formProject.start_date || !formProject.end_date) {
+            alert('Please fill in all required fields.');
             return;
         }
 
-        axios.post('http://localhost:3001/project', {
+        const payload = {
             ...formProject,
-            project_member: JSON.stringify(formProject.project_member) // เปลี่ยนเป็นเเบบ JSON
-        })
+            start_date: formatDate(formProject.start_date),
+            end_date: formatDate(formProject.end_date),
+            project_member: JSON.stringify(formProject.project_member),
+        };
+
+        console.log('Payload:', payload);
+
+        axios
+            .post('http://localhost:3001/project', payload)
             .then(() => {
                 alert('Project created successfully!');
-                navigate('/project');
+                navigate('/Project');
             })
-            .catch(err => {
-                console.error(err);
+            .catch((err) => {
+                console.error('Error creating project:', err);
                 alert('Failed to create project');
             });
     };
@@ -81,19 +94,26 @@ const CreateProject = () => {
                     />
                 </label>
                 <label>
-                    Project Duration:
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                        <input
-                            type="text"
-                            name="project_duration"
-                            value={formProject.project_duration}
-                            onChange={(e) =>
-                                setFormProject({ ...formProject, project_duration: e.target.value })
-                            }
-                            style={{ flex: '1' }}
-                        />
-                        <span style={{ marginLeft: '8px' }}>Days</span>
-                    </div>
+                    Start Date:
+                    <input
+                        type="date"
+                        name="start_date"
+                        value={formProject.start_date}
+                        onChange={(e) =>
+                            setFormProject({ ...formProject, start_date: e.target.value })
+                        }
+                    />
+                </label>
+                <label>
+                    End Date:
+                    <input
+                        type="date"
+                        name="end_date"
+                        value={formProject.end_date}
+                        onChange={(e) =>
+                            setFormProject({ ...formProject, end_date: e.target.value })
+                        }
+                    />
                 </label>
                 <label>Select Members:</label>
                 <Select
@@ -103,9 +123,10 @@ const CreateProject = () => {
                     className="select-members"
                     classNamePrefix="select"
                     onChange={handleChange}
-                    value={members.filter(member => formProject.project_member.includes(member.value))}
+                    value={members.filter((member) =>
+                        formProject.project_member.includes(member.value)
+                    )}
                 />
-
                 <button type="submit">Create Project</button>
             </form>
         </div>

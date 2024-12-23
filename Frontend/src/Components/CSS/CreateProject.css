@@ -5,7 +5,6 @@
   justify-content: center;
   align-items: center;
   height: 100vh;
-  /* Make sure it takes full viewport height */
   padding: 20px;
   box-sizing: border-box;
 }
@@ -20,7 +19,6 @@
   flex-direction: column;
   width: 100%;
   max-width: 600px;
-  /* Limit form width */
   padding: 20px;
   background-color: #f9f9f9;
   border-radius: 8px;

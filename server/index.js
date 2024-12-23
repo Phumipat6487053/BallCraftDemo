@@ -38,60 +38,90 @@ app.get('/project', (req, res) => {
 });
 
 // Get a project by ID
+
+app.get('/project/data', async (req, res) => {
+    const projectName = req.query.name;
+    const projectData = await db.findProjectByName(projectName); // ค้นหาโปรเจคในฐานข้อมูล
+    if (projectData) {
+      res.json(projectData);
+    } else {
+      res.status(404).json({ error: 'Project not found' });
+    }
+  });
+  
 app.get('/project/:id', (req, res) => {
     const sql = "SELECT * FROM project WHERE project_id = ?";
     const id = req.params.id;
 
     db.query(sql, [id], (err, result) => {
         if (err) {
-            console.error(err);
-            res.status(500).send('Error fetching the project');
+            console.error('Error fetching project:', err);
+            res.status(500).send("Error fetching the project");
         } else if (result.length > 0) {
-            res.send(result[0]);
+            res.json(result[0]);
         } else {
-            res.status(404).send('Project not found');
+            res.status(404).send("Project not found");
         }
     });
 });
 
 // Add a new project
-app.post('/project', (req, res) => {
-    const sql = "INSERT INTO project (project_name, project_description, project_duration, project_member) VALUES (?, ?, ?, ?)";
-    const values = [
-        req.body.project_name,
-        req.body.project_description,
-        req.body.project_duration,
-        req.body.project_member
-    ];
-
-    db.query(sql, values, (err, data) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ message: "Error adding project" });
-        }
-        return res.status(200).json({ message: "Project added successfully", data });
+    app.post('/project', (req, res) => {
+        console.log('Request Body:', req.body); // ดูข้อมูลที่ส่งมา
+        const sql = `
+            INSERT INTO project 
+            (project_name, project_description, project_member, start_date, end_date) 
+            VALUES (?, ?, ?, ?, ?)
+        `;
+        const values = [
+            req.body.project_name,
+            req.body.project_description,
+            req.body.project_member,
+            req.body.start_date,
+            req.body.end_date
+        ];
+    
+        db.query(sql, values, (err, data) => {
+            if (err) {
+                console.error('Database Error:', err); // แสดง Error ใน Console
+                return res.status(500).json({ message: "Error adding project" });
+            }
+            return res.status(200).json({ message: "Project added successfully", data });
+        });
     });
-});
 
-// Update an existing project
+// Update a project
 app.put('/project/:id', (req, res) => {
-    const sql = "UPDATE project SET project_name = ?, project_description = ?, project_duration = ?, project_member = ? WHERE project_id = ?";
+    const sql = `
+        UPDATE project 
+        SET 
+            project_name = ?, 
+            project_description = ?, 
+            project_member = ?, 
+            start_date = ?, 
+            end_date = ?
+        WHERE 
+            project_id = ?
+    `;
     const values = [
         req.body.project_name,
         req.body.project_description,
-        req.body.project_duration,
         req.body.project_member,
+        req.body.start_date,
+        req.body.end_date,
         req.params.id
     ];
 
     db.query(sql, values, (err, data) => {
         if (err) {
-            console.error(err);
+            console.error('Error updating project:', err);
             return res.status(500).json({ message: "Error updating project" });
         }
         return res.status(200).json({ message: "Project updated successfully", data });
     });
 });
+
+
 
 // Delete a project
 app.delete('/project/:id', (req, res) => {
@@ -131,7 +161,7 @@ app.get('/requirement', (req, res) => {
             console.error(err);
             res.status(500).send("Error fetching requirements");
         } else {
-            res.json(results);
+            res.status(200).json(results);
         }
     });
 });
@@ -146,7 +176,7 @@ app.get('/requirement/:id', (req, res) => {
             console.error(err);
             res.status(500).send("Error fetching the requirement");
         } else if (result.length > 0) {
-            res.json(result[0]);
+            res.status(200).json(result[0]);
         } else {
             res.status(404).send("Requirement not found");
         }
@@ -167,18 +197,17 @@ app.post('/requirement', (req, res) => {
             console.error(err);
             return res.status(500).json({ message: "Error adding requirement" });
         }
-        return res.status(200).json({ message: "Requirement added successfully", data });
+        return res.status(201).json({ message: "Requirement added successfully", data });
     });
 });
 
-
 // Update an existing requirement
 app.put('/requirement/:id', (req, res) => {
-    const sql = "UPDATE requirement SET requirement_name = ?, requirement_description =? , requirement_type = ?, WHERE requirement_id = ?";
+    const sql = "UPDATE requirement SET requirement_name = ?, requirement_description = ?, requirement_type = ? WHERE requirement_id = ?";
     const values = [
         req.body.requirement_name,
-        req.body.requirement_type,
         req.body.requirement_description,
+        req.body.requirement_type,
         req.params.id
     ];
 
@@ -205,6 +234,7 @@ app.delete('/requirement/:id', (req, res) => {
     });
 });
 
+// Get requirements by project ID
 app.get('/project/:id/requirements', (req, res) => {
     const sql = `
         SELECT 
@@ -224,10 +254,12 @@ app.get('/project/:id/requirements', (req, res) => {
             console.error(err);
             res.status(500).send('Error fetching requirements');
         } else {
-            res.json(results);
+            res.status(200).json(results);
         }
     });
 });
+
+// Get all projects with their requirements
 app.get('/projects-with-requirements', (req, res) => {
     const sql = `
         SELECT 
@@ -270,13 +302,20 @@ app.get('/projects-with-requirements', (req, res) => {
                 return acc;
             }, {});
 
-            res.json(Object.values(groupedData));
+            res.status(200).json(Object.values(groupedData));
         }
     });
 });
 
 
-
+// ------------------------- Files -------------------------
+app.get("/files", (req, res) => {
+    // Example query for fetching file data
+    db.query("SELECT * FROM uploaded_files", (err, result) => {
+      if (err) throw err;
+      res.json(result);
+    });
+  });
 
 
 // ------------------------- SERVER LISTENER -------------------------

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+
 import './CSS/Dashboard.css';
-import RequirementPage from './requirementPage';
+import RequirementPage from './RequirementPage';
 
 const Dashboard = () => {
   const location = useLocation();

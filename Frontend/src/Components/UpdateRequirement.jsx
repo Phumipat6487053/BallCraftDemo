@@ -21,7 +21,7 @@ const UpdateRequirement = () => {
         setRequirementData({
           requirement_name: res.data.requirement_name,
           requirement_type: res.data.requirement_type,
-          requirement_description: res.data.requirement_description
+          requirement_description: res.data.requirement_description,
         });
         setLoading(false);
       })
@@ -43,7 +43,7 @@ const UpdateRequirement = () => {
 
       if (response.status === 200) {
         alert('Requirement updated successfully!');
-        navigate('/'); // Navigate to the "RequirementPage" or dashboard
+        navigate(`/Dashboard?project=YourProjectName`); // Redirect to Dashboard with query string
       }
     } catch (error) {
       console.error('Error updating requirement:', error);
@@ -65,8 +65,8 @@ const UpdateRequirement = () => {
   }
 
   return (
-    <div className="update-requirement">
-      <h1>Update Requirement</h1>
+    <div className="update-requirement"> 
+      <h1>Update Requirement</h1> 
       <form className="requirement-form" onSubmit={handleSubmit}>
         <div className="form-group">
           <label htmlFor="requirement_name">Requirement Statement</label>
@@ -74,29 +74,40 @@ const UpdateRequirement = () => {
             type="text"
             id="requirement_name"
             name="requirement_name"
-            value={requirementData.requirement_name}
+            value={requirementData.requirement_name} 
             onChange={handleChange}
             placeholder="Enter requirement statement"
             required
           />
         </div>
         <div className="form-group">
-          <label htmlFor="type">Type</label>
+          <label htmlFor="requirement_type">Type</label>
           <select
-            id="type"
-            name="type"
+            id="requirement_type"
+            name="requirement_type"
             value={requirementData.requirement_type}
             onChange={handleChange}
           >
-            <option value="Functional">Functional</option>
-            <option value="Non-Functional">Non-Functional</option>
+            <option value="" disabled>Select Type</option>
+            <option value="Functional">Functionality</option>
+            <option value="User interface">User interface</option>
+            <option value="External interfaces">External interfaces</option>
+            <option value="Reliability">Reliability</option>
+            <option value="Maintenance">Maintenance</option>
+            <option value="Portability">Portability</option>
+            <option value="Limitations Design and construction">
+              Limitations Design and construction
+            </option>
+            <option value="Interoperability">Interoperability</option>
+            <option value="Non-Functional">Reusability</option>
+            <option value="Non-Functional">Legal and regulative</option>
           </select>
         </div>
         <div className="form-group">
-          <label htmlFor="description">Description</label>
+          <label htmlFor="requirement_description">Description</label>
           <textarea
-            id="description"
-            name="description"
+            id="requirement_description"
+            name="requirement_description"
             value={requirementData.requirement_description}
             onChange={handleChange}
             placeholder="Enter requirement description"
@@ -111,9 +122,9 @@ const UpdateRequirement = () => {
           <button
             type="button"
             className="btn btn-back"
-            onClick={() => navigate('/RequirementPage')} // Navigate back to RequirementPage or dashboard
+            onClick={() => navigate('/Dashboard')}
           >
-            Back to Requirements
+            Back to Dashboard
           </button>
         </div>
       </form>

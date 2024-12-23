@@ -1,24 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMagnifyingGlass, faPenToSquare, faTrash } from '@fortawesome/free-solid-svg-icons';
-import './CSS/RequirementPage.css';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPen, faTrash, faPlus, faCheckSquare, faFileUpload } from "@fortawesome/free-solid-svg-icons";
+import "./CSS/RequirementPage.css";
 
 const RequirementPage = () => {
   const [requirementList, setRequirementList] = useState([]);
-  const [filteredRequirements, setFilteredRequirements] = useState([]);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedRequirements, setSelectedRequirements] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [file, setFile] = useState(null); // สำหรับการอัปโหลดไฟล์
   const navigate = useNavigate();
 
   // Fetch requirements on initial load
   useEffect(() => {
     axios
-      .get('http://localhost:3001/requirement')
+      .get("http://localhost:3001/requirement")
       .then((res) => {
         setRequirementList(res.data);
-        setFilteredRequirements(res.data);
         setLoading(false);
       })
       .catch((err) => {
@@ -27,108 +26,153 @@ const RequirementPage = () => {
       });
   }, []);
 
-  // Handle search filtering
-  useEffect(() => {
-    if (searchQuery === '') {
-      setFilteredRequirements(requirementList);
-    } else {
-      setFilteredRequirements(
-        requirementList.filter((requirement) =>
-          requirement.requirement_name.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-      );
-    }
-  }, [searchQuery, requirementList]);
-
-  // Handle navigate to requirement detail
-  const handleNavigateToDetail = (requirementId) => {
-    navigate(`/RequirementDetail/${requirementId}`);
+  // Handle select/deselect requirement
+  const handleSelectRequirement = (id) => {
+    setSelectedRequirements((prev) =>
+      prev.includes(id)
+        ? prev.filter((reqId) => reqId !== id)
+        : [...prev, id]
+    );
   };
 
-  // Handle requirement deletion
+  // Handle delete with confirmation
   const handleDelete = (requirementId) => {
-    axios
-      .delete(`http://localhost:3001/requirement/${requirementId}`)
-      .then((response) => {
-        console.log('Requirement deleted:', response.data);
-        setRequirementList(requirementList.filter((req) => req.requirement_id !== requirementId));
-        setFilteredRequirements(filteredRequirements.filter((req) => req.requirement_id !== requirementId));
-      })
-      .catch((err) => {
-        console.log('Error deleting requirement:', err);
-      });
+    if (window.confirm("Are you sure you want to delete this requirement?")) {
+      axios
+        .delete(`http://localhost:3001/requirement/${requirementId}`)
+        .then((response) => {
+          console.log("Requirement deleted:", response.data);
+          setRequirementList((prev) =>
+            prev.filter((req) => req.requirement_id !== requirementId)
+          );
+        })
+        .catch((err) => {
+          console.log("Error deleting requirement:", err);
+        });
+    }
   };
 
+  // Handle file upload
+  const handleFileUpload = (e) => {
+    setFile(e.target.files[0]);
+  };
+
+  const handleUploadSubmit = () => {
+    if (file) {
+      const formData = new FormData();
+      formData.append("file", file);
+      axios
+        .post("http://localhost:3001/upload", formData)
+        .then((res) => {
+          console.log("File uploaded successfully:", res.data);
+          setFile(null);
+        })
+        .catch((err) => {
+          console.error("Error uploading file:", err);
+        });
+    } else {
+      alert("Please select a file to upload.");
+    }
+  };
+
+  //จัดให้ตัวหนังสือมันห่างๆกันหน่อย
   return (
     <div className="requirement-container">
       <div className="top-section">
         <h1 className="requirement-title">Requirements</h1>
-        <button onClick={() => navigate('/CreateRequirement')} className="create-requirement-button">
-          Create Requirement
-        </button>
+        <div className="action-buttons">
+
+        <button className="review-button"
+          onClick={() => navigate("/ReviewReqVeri")}
+          >
+            <FontAwesomeIcon icon={faCheckSquare} /> Review Verification
+          </button>
+
+          <button className="verify-button"
+          onClick={() => navigate("/ReqVerification")}
+          >
+            <FontAwesomeIcon icon={faCheckSquare} /> Verification
+          </button>
+          
+          <button
+            onClick={() => navigate("/CreateRequirement")}
+            className="add-requirement-button"
+          >
+            <FontAwesomeIcon icon={faPlus} /> Add Requirements
+          </button>
+        </div>
       </div>
 
       <div className="content-container">
-        <div className="requirement-search-section">
-          <div className="requirement-search">
-            <input
-              type="text"
-              className="requirement-search-input"
-              placeholder="Search Requirement"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            <FontAwesomeIcon icon={faMagnifyingGlass} className="search-icon" />
-          </div>
-
-          {loading ? (
-            <p>Loading requirements...</p>
-          ) : (
-            <table className="requirement-table">
-              <thead>
+        {loading ? (
+          <p>Loading requirements...</p>
+        ) : (
+          <table className="requirement-table">
+            <thead>
+              <tr>
+                <th>Select</th>
+                <th>ID</th>
+                <th>Description</th>
+                <th>Type</th>
+                <th>Actions</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {requirementList.length === 0 ? (
                 <tr>
-                  <th>Requirement Name</th>
-                  <th>Description</th>
-                  <th>Type</th>
-                  <th>Action</th>
+                  <td colSpan="6">No requirements available</td>
                 </tr>
-              </thead>
-              <tbody>
-                {filteredRequirements.length === 0 ? (
-                  <tr>
-                    <td colSpan="4">No requirements available</td>
-                  </tr>
-                ) : (
-                  filteredRequirements.map((data) => (
-                    <tr key={data.requirement_id}>
-                      <td
-                        className="requirement-name-link"
-                        onClick={() => handleNavigateToDetail(data.requirement_id)}
+              ) : (
+                requirementList.map((data) => (
+                  <tr key={data.requirement_id}>
+                    <td>
+                      <input
+                        type="checkbox"
+                        checked={selectedRequirements.includes(
+                          data.requirement_id
+                        )}
+                        onChange={() =>
+                          handleSelectRequirement(data.requirement_id)
+                        }
+                      />
+                    </td>
+                    <td>{data.requirement_id}</td>
+                    <td>{data.requirement_description}</td>
+                    <td>{data.requirement_type}</td>
+                    <td>
+                      <button
+                        onClick={() =>
+                          navigate(`/UpdateRequirement/${data.requirement_id}`)
+                        }
+                        className="edit-req"
                       >
-                        {data.requirement_name}
-                      </td>
-                      <td>{data.requirement_description}</td>
-                      <td>{data.requirement_type}</td>
-                      <td>
-                        <button
-                          onClick={() => navigate(`/UpdateRequirement/${data.requirement_id}`)}
-                          className="edit-req"
-                        >
-                          <FontAwesomeIcon icon={faPenToSquare} className="edit-icon" />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(data.requirement_id)}
-                          className="delete-req"
-                        >
-                          <FontAwesomeIcon icon={faTrash} className="trash-icon" />
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          )}
+                        <FontAwesomeIcon icon={faPen} className="edit-icon" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(data.requirement_id)}
+                        className="delete-req"
+                      >
+                        <FontAwesomeIcon icon={faTrash} className="trash-icon" />
+                      </button>
+                    </td>
+                    
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        )}
+      </div>
+
+      {/* File Upload Section */}
+      <div className="file-upload-section">
+        <h3>File</h3>
+        <div className="file-upload-container">
+          <input type="file" onChange={handleFileUpload} className="file-input" />
+          <button onClick={handleUploadSubmit} className="upload-button">
+            <FontAwesomeIcon icon={faFileUpload} /> Add File
+          </button>
         </div>
       </div>
     </div>

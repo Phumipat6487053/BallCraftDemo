@@ -5,76 +5,74 @@ import Select from 'react-select';
 import './CSS/UpdateProject.css';
 
 const UpdateProject = () => {
-    const { id } = useParams(); // ดึง project id จาก URL
-    const [members, setMembers] = useState([]); // รายการสมาชิกที่ใช้แสดงใน dropdown
+    const { id } = useParams();
+    const [members, setMembers] = useState([]);
     const [formEditProject, setFormEditProject] = useState({
         project_name: '',
         project_description: '',
-        project_duration: '',
-        project_member: []
+        project_member: [],
+        start_date: '',
+        end_date: '',
     });
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
-    // ดึงข้อมูลโปรเจกต์ที่มีอยู่จาก API
     useEffect(() => {
         axios
-            .get(`http://localhost:3001/project/${id}`)
+            .get(`http://localhost:3001/project/${id}`) // ดึงข้อมูล Project ให้ขึ้นที่หน้า Update
             .then((res) => {
                 const projectData = res.data;
                 setFormEditProject({
                     project_name: projectData.project_name,
                     project_description: projectData.project_description,
-                    project_duration: projectData.project_duration,
-                    project_member: JSON.parse(projectData.project_member) || []
+                    project_member: JSON.parse(projectData.project_member) || [],
+                    start_date: projectData.start_date || '',
+                    end_date: projectData.end_date || '',
                 });
                 setLoading(false);
             })
             .catch((err) => {
-                console.log('Error fetching project data:', err);
+                console.error('Error fetching project data:', err);
                 setLoading(false);
             });
     }, [id]);
 
-    // ดึงข้อมูลสมาชิกจาก API เพื่อนำไปแสดงใน dropdown
     useEffect(() => {
         axios
             .get('http://localhost:3001/member')
             .then((res) => {
                 const memberOptions = res.data.map((member) => ({
                     value: member.member_name,
-                    label: `${member.member_name} (${member.member_role})`
+                    label: `${member.member_name} (${member.member_role})`,
                 }));
                 setMembers(memberOptions);
             })
-            .catch((err) => console.log('Error fetching members:', err));
+            .catch((err) => console.error('Error fetching members:', err));
     }, []);
 
-    // ฟังก์ชันสำหรับอัปเดตค่า state เมื่อแก้ไข input field
     const handleChange = (selectedOptions) => {
         setFormEditProject({
             ...formEditProject,
-            project_member: selectedOptions ? selectedOptions.map((option) => option.value) : []
+            project_member: selectedOptions ? selectedOptions.map((option) => option.value) : [],
         });
     };
 
-    // ฟังก์ชันสำหรับส่งข้อมูลที่แก้ไขกลับไปยัง backend
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        if (!formEditProject.project_name.trim()) {
-            alert('Project Name is required');
+        if (!formEditProject.project_name.trim() || !formEditProject.start_date || !formEditProject.end_date) {
+            alert('Please fill in all required fields');
             return;
         }
 
         axios
             .put(`http://localhost:3001/project/${id}`, {
                 ...formEditProject,
-                project_member: JSON.stringify(formEditProject.project_member)
+                project_member: JSON.stringify(formEditProject.project_member),
             })
             .then(() => {
                 alert('Project updated successfully!');
-                navigate('/'); // กลับไปที่หน้ารายการโปรเจกต์
+                navigate('/Project'); // เผื่อมีเปลี่ยน path อยู่ตรงนี้เด้อ
             })
             .catch((err) => {
                 console.error('Error updating project:', err);
@@ -82,15 +80,31 @@ const UpdateProject = () => {
             });
     };
 
-    // แสดงสถานะ Loading ระหว่างดึงข้อมูล
-    if (loading) {
-        return <div>Loading...</div>;
-    }
+    const formatDateForInput = (date) => {
+        if (!date) return '';
+        const parsedDate = new Date(date);
+        return isNaN(parsedDate) ? '' : parsedDate.toISOString().split('T')[0];
+    };
 
-    return (
-        <div className="update-project">
+    const formatDateForDisplay = (date) => { // เงื่อนไขจัดเรียงวันที่ update ให้เป็น วัน/เดือน/ปี
+        if (!date) return '';
+        const parsedDate = new Date(date);
+        if (isNaN(parsedDate)) return '';
+        const day = parsedDate.getDate().toString().padStart(2, '0');
+        const month = (parsedDate.getMonth() + 1).toString().padStart(2, '0');
+        const year = parsedDate.getFullYear();
+        return `${day}/${month}/${year}`;
+    };
+    
+
+    if (loading) {
+        return <div>Loading...</div>; //อันนี้ลูกเล่นเฉยๆไม่ต้องเสือก.......หยอกๆ
+    } 
+
+    return ( // ผลลัพท์หน้าบ้าน มีไรแก้ตรงนี้
+        <div className="update-project"> 
             <h2>Update Project</h2>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit}> 
                 <label>
                     Project Name:
                     <input
@@ -114,16 +128,26 @@ const UpdateProject = () => {
                     />
                 </label>
                 <label>
-                    Project Duration:
+                    Start Date:
                     <input
-                        type="number"
-                        name="project_duration"
-                        value={formEditProject.project_duration}
+                        type="date"
+                        name="start_date"
+                        value={formatDateForInput(formEditProject.start_date)}
                         onChange={(e) =>
-                            setFormEditProject({ ...formEditProject, project_duration: e.target.value })
+                            setFormEditProject({ ...formEditProject, start_date: e.target.value })
                         }
                     />
-                    <span>Days</span>
+                </label>
+                <label>
+                    End Date:
+                    <input
+                        type="date"
+                        name="end_date"
+                        value={formatDateForInput(formEditProject.end_date)}
+                        onChange={(e) =>
+                            setFormEditProject({ ...formEditProject, end_date: e.target.value })
+                        }
+                    />
                 </label>
                 <label>Select Members:</label>
                 <Select

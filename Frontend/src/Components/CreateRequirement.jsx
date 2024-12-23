@@ -55,8 +55,16 @@ const CreateRequirement = () => {
             onChange={(e) => setRequirementType(e.target.value)}
           >
             <option value="" disabled>Select Type</option>
-            <option value="Functional">Functional</option>
-            <option value="Non-Functional">Non-Functional</option>
+            <option value="Functional">Functionality</option>
+            <option value="User interface">User interface</option>
+            <option value="External interfaces">External interfaces</option>
+            <option value="Reliability">Reliability</option>
+            <option value="Maintenance">Maintenance</option>
+            <option value="Portability">Portability</option>
+            <option value="Limitations Design and construction">Limitations Design and construction</option>
+            <option value="Interoperability">Interoperability</option>
+            <option value="Reusability">Reusability</option>
+            <option value="Legal and regulative">Legal and regulative</option>
           </select>
         </div>
         <div className="form-group">
