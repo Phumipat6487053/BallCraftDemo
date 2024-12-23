@@ -1,10 +1,11 @@
-/* Project.css */
+/* Topic Section */
 .topic-project {
     margin: 30px 0px 0px 30px;
     padding: 10px 20px;
     border-radius: 8px;
 }
 
+/* Top Section */
 .top-section {
     display: flex;
     align-items: center;
@@ -14,19 +15,21 @@
 
 .project-title {
     font-size: 2rem;
+    font-weight: bold;
     color: #333;
     margin: 0;
 }
 
+/* Create Project Button */
 .create-project-btn {
     padding: 10px 20px;
     font-size: 1rem;
     color: #008767;
     background-color: #16C09861;
-    border: #00B087;
-    border-radius: 5px;
+    border: 1px solid #00B087;
+    border-radius: 10px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: all 0.3s ease;
 }
 
 .create-project-btn:hover {
@@ -34,21 +37,28 @@
     color: whitesmoke;
 }
 
+/* Project Search */
 .project-search {
     position: relative;
     margin-top: 30px;
+    display: flex;
+    align-items: center;
 }
 
 .project-search-input {
-    padding: 10px;
-    font-size: 1rem;
     width: 100%;
     max-width: 500px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
+    padding: 10px 15px;
+    font-size: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
     outline: none;
     padding-left: 40px;
     transition: border 0.3s;
+}
+
+.project-search-input:focus {
+    border-color: #007bff;
 }
 
 .search-icon {
@@ -57,12 +67,10 @@
     top: 50%;
     transform: translateY(-50%);
     font-size: 1.2rem;
+    color: #888;
 }
 
-.project-search-input:focus {
-    border: 1px solid #007bff;
-}
-
+/* Project Table */
 .project-table {
     width: 100%;
     border-collapse: collapse;
@@ -71,15 +79,15 @@
 
 .project-table th,
 .project-table td {
-    padding: 10px;
+    padding: 10px 15px;
     text-align: left;
     font-size: 1rem;
 }
 
 .project-table th {
-    background-color: #f1f1f1;
+    background-color: #f4f4f4;
     color: #333;
-    font-weight: normal;
+    font-weight: bold;
 }
 
 .project-table td {
@@ -89,28 +97,56 @@
 }
 
 .project-table tr:hover {
-    background-color: #fafafa;
+    background-color: #f9f9f9;
 }
 
-.project-table .action-buttons {
-    display: flex;
-    gap: 10px;
-}
-
-.project-table .btn {
-    padding: 6px 10px;
-    font-size: 0.875rem;
+/* Action Buttons */
+.action-button {
+    background: none;
     border: none;
-    border-radius: 4px;
+    padding: 5px;
+    margin: 0 0 5px;
     cursor: pointer;
-    background-color: #f1f1f1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.action-icon {
+    text-align: center;
+    font-size: 20px;
     color: #555;
 }
 
-.project-table .btn:hover {
-    background-color: #ddd;
+.action-button:hover {
+    background-color: #f5f5f5;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
+.edit-req .action-icon {
+    color: #28a745;
+}
+
+.delete-req .action-icon {
+    color: #dc3545;
+}
+
+.action-button:active {
+    transform: scale(0.95);
+}
+
+.project-name-link {
+    cursor: pointer;
+}
+
+.project-name-link:hover {
+    color: grey;
+    text-decoration: none;
+}
+
+/* Content Container */
 .content-container {
     display: flex;
     justify-content: space-between;
@@ -120,34 +156,4 @@
 
 .project-section {
     flex: 1;
-}
-
-.project-name-link {
-    cursor: pointer;
-}
-
-.project-name-link:hover {
-    color: grey;
-}
-
-button {
-    background: none;
-    border: none;
-    padding: 0;
-    cursor: pointer;
-}
-
-button:focus {
-    outline: none;
-}
-
-.trash-icon {
-    padding-left: 10px;
-    font-size: 20px;
-    color: #ff4d4d;
-}
-
-.edit-icon {
-    font-size: 20px;
-    color: #0061FF;
 }

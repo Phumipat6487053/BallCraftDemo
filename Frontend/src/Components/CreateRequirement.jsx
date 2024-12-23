@@ -7,34 +7,52 @@ const CreateRequirement = () => {
   const [requirementStatement, setRequirementStatement] = useState('');
   const [requirementType, setRequirementType] = useState('');
   const [description, setDescription] = useState('');
+  const [error, setError] = useState('');
   const navigate = useNavigate();
+  const queryParams = new URLSearchParams(window.location.search);
+  const projectId = queryParams.get('project_id');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!requirementStatement || !requirementType || !description) {
+      setError("Please fill in all fields.");
+      return;
+    }
+
     const newRequirement = {
       requirement_name: requirementStatement,
       requirement_type: requirementType,
-      requirement_description: description
+      requirement_description: description,
+      project_id: projectId,  // ส่ง projectId ไปด้วย
     };
-
 
     try {
       const response = await axios.post('http://localhost:3001/requirement', newRequirement);
 
-      if (response.status === 200) {
+      if (response.status === 201) {
         alert('Requirement created successfully');
-        navigate(`/Dashboard?project=YourProjectName`); // Redirect to Dashboard with query string
+        navigate(`/Dashboard?project_id=${projectId}`, {
+          state: { selectedSection: 'Requirement' }, // เลือก section Requirement
+        });  // Redirect ไปที่ Dashboard และไปที่ค่า selectedSection เป็น 'Requirement'
+      } else {
+        console.error("Failed to create requirement:", response);
+        alert('Failed to create requirement');
       }
     } catch (error) {
       console.error('Error creating requirement:', error);
-      alert('Error creating requirement');
+      if (error.response) {
+        setError(error.response.data.message || 'Something went wrong');
+      } else {
+        setError('Network error. Please try again.');
+      }
     }
   };
 
   return (
     <div className="requirement-specification">
       <h1>Create New Requirement</h1>
+      {error && <p className="error-message">{error}</p>}
       <form className="requirement-form" onSubmit={handleSubmit}>
         <div className="form-group">
           <label htmlFor="requirementStatement">Requirement Statement</label>
@@ -53,6 +71,7 @@ const CreateRequirement = () => {
             id="requirementType"
             value={requirementType}
             onChange={(e) => setRequirementType(e.target.value)}
+            required
           >
             <option value="" disabled>Select Type</option>
             <option value="Functional">Functionality</option>
@@ -82,14 +101,13 @@ const CreateRequirement = () => {
           <button
             type="button"
             className="btn btn-back"
-            onClick={() => navigate('/Dashboard')}
+            onClick={() => navigate(`/Dashboard?project_id=${projectId}`, { state: { selectedSection: 'Requirement' } })}
           >
-            Back to Dashboard
+            Back to Requirements
           </button>
           <button type="submit" className="btn btn-primary">
             Create
           </button>
-
         </div>
       </form>
     </div>

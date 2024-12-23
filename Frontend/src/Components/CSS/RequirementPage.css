@@ -1,109 +1,166 @@
-/* RequirementPage.css */
-
-/* ปรับโครงสร้างพื้นฐาน */
 .requirement-container {
-    width: 100%;
-    margin: 20px;
-    font-family: 'Arial', sans-serif;
-    color: #333;
-  }
-  
-  /* หัวข้อ */
-  .requirement-title {
-    font-size: 2em;
-    font-weight: bold;
-    color: #005daa; /* สี Samsung */
-    margin-bottom: 20px;
-  }
-  
-  /* ปุ่มใน top-section */
-  .top-section .action-buttons button {
-    margin: 0 10px;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    background-color: #007acc; /* สีพื้นหลังปุ่ม */
-    color: white;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .top-section .action-buttons button:hover {
-    background-color: #005daa; /* สีเมื่อ Hover */
-  }
-  
-  /* ตาราง */
-  .requirement-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-    font-size: 0.9em;
-  }
-  
-  .requirement-table th, .requirement-table td {
-    border: 1px solid #ddd;
-    padding: 10px;
-    text-align: left;
-  }
-  
-  .requirement-table th {
-    background-color: #f2f2f2;
-    color: #333;
-  }
-  
-  .requirement-table tr:hover {
-    background-color: #f9f9f9;
-  }
-  
-  .edit-req, .delete-req {
-    margin: 0 5px;
-    padding: 5px 10px;
-    border: none;
-    border-radius: 3px;
-    color: white;
-    cursor: pointer;
-  }
-  
-  .edit-req {
-    background-color: #28a745; /* สีเขียวสำหรับแก้ไข */
-  }
-  
-  .delete-req {
-    background-color: #dc3545; /* สีแดงสำหรับลบ */
-  }
-  
-  /* ฟอร์มอัปโหลดไฟล์ */
-  .file-upload-section {
-    margin-top: 20px;
-    padding: 15px;
-    background-color: #f9f9f9;
-    border-radius: 5px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-  }
-  
-  .file-upload-container {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  
-  .file-input {
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-  }
-  
-  .upload-button {
-    padding: 10px 20px;
-    background-color: #007acc;
-    border: none;
-    color: white;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .upload-button:hover {
-    background-color: #005daa;
-  }
-  
+  width: 100%;
+  margin: 20px;
+  font-family: 'Arial', sans-serif;
+  color: #333;
+}
+
+
+.requirement-title {
+  font-size: 2em;
+  font-weight: bold;
+  color: #005daa;
+  /* สี Topic-project */
+  margin-bottom: 20px;
+}
+
+/* ปุ่มใน top-section */
+.top-section .action-buttons button {
+  margin: 0 10px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  background-color: #007acc;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.top-section .action-buttons button:hover {
+  background-color: #005daa;
+}
+
+/* ตาราง */
+.requirement-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  font-size: 0.9em;
+}
+
+.requirement-table th,
+.requirement-table td {
+  border: 1px solid #ddd;
+  padding: 10px 15px;
+  text-align: center;
+}
+
+.requirement-table th {
+  background-color: #f2f2f2;
+  color: #333;
+}
+
+.requirement-table tr:hover {
+  background-color: #f9f9f9;
+}
+
+
+
+/* ฟอร์มอัปโหลดไฟล์ */
+.file-upload-section {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #f9f9f9;
+  border-radius: 5px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.file-upload-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.file-input {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+.upload-button {
+  padding: 10px 20px;
+  background-color: #007acc;
+  border: none;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.upload-button:hover {
+  background-color: #005daa;
+}
+
+
+.action-button {
+  background: none;
+  border: none;
+  padding: 8px;
+  margin: 0 8px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+
+.action-icon {
+  font-size: 18px;
+  color: #555;
+}
+
+.action-button:hover {
+  background-color: #f0f0f0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.edit-req .action-icon {
+  color: #4caf50;
+}
+
+.delete-req .action-icon {
+  color: #f44336;
+}
+
+.action-button:active {
+  transform: scale(0.98);
+}
+
+.requirement-table td,
+.requirement-table th {
+  padding: 10px 15px;
+}
+
+.req-search {
+  position: relative;
+  margin-top: 30px;
+  display: flex;
+  align-items: center;
+}
+
+.req-search-input {
+  width: 100%;
+  max-width: 500px;
+  padding: 10px 15px;
+  font-size: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  outline: none;
+  padding-left: 40px;
+  transition: border 0.3s;
+}
+
+.req-search-input:focus {
+  border-color: #007bff;
+}
+
+.search-icon-req {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.2rem;
+  color: #888;
+}

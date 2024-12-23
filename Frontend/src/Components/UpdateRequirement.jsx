@@ -1,63 +1,66 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useNavigate, useParams } from 'react-router-dom';
 import './CSS/UpdateRequirement.css';
+import { useNavigate, useParams } from 'react-router-dom';
 
 const UpdateRequirement = () => {
-  const { id } = useParams(); // Retrieve requirement ID from URL
-  const [requirementData, setRequirementData] = useState({
-    requirement_name: '',
-    requirement_type: '',
-    requirement_description: '',
-  });
+  const [requirementStatement, setRequirementStatement] = useState('');
+  const [requirementType, setRequirementType] = useState('');
+  const [description, setDescription] = useState('');
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const queryParams = new URLSearchParams(window.location.search);
+  const projectId = queryParams.get('project_id'); // รับค่า project_id จาก query params
 
-  // Fetch existing requirement data from the API
+  // ดึงข้อมูล requirement ที่จะอัปเดตจาก backend
   useEffect(() => {
     axios
-      .get(`http://localhost:3001/requirement/${id}`)
+      .get(`http://localhost:3001/requirement/${projectId}`)
       .then((res) => {
-        setRequirementData({
-          requirement_name: res.data.requirement_name,
-          requirement_type: res.data.requirement_type,
-          requirement_description: res.data.requirement_description,
-        });
+        setRequirementStatement(res.data.requirement_name);
+        setRequirementType(res.data.requirement_type);
+        setDescription(res.data.requirement_description);
         setLoading(false);
       })
       .catch((err) => {
         console.error('Error fetching requirement data:', err);
+        setError('Failed to fetch requirement data');
         setLoading(false);
       });
-  }, [id]);
+  }, [projectId]);
 
-  // Handle form submission to update the requirement
+  // การส่งข้อมูลไปที่ backend เพื่ออัปเดต requirement
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const updatedRequirement = {
+      requirement_name: requirementStatement,
+      requirement_type: requirementType,
+      requirement_description: description,
+      project_id: projectId, // ส่ง projectId ไปด้วย
+    };
+
     try {
-      const response = await axios.put(
-        `http://localhost:3001/requirement/${id}`,
-        requirementData
-      );
+      const response = await axios.put(`http://localhost:3001/requirement/${projectId}`, updatedRequirement);
 
       if (response.status === 200) {
-        alert('Requirement updated successfully!');
-        navigate(`/Dashboard?project=YourProjectName`); // Redirect to Dashboard with query string
+        alert('Requirement updated successfully');
+        navigate(`/Dashboard?project_id=${projectId}`, {
+          state: { selectedSection: 'Requirement' }, // เลือก section Requirement
+        });
+      } else {
+        console.error("Failed to update requirement:", response);
+        alert('Failed to update requirement');
       }
     } catch (error) {
       console.error('Error updating requirement:', error);
-      alert('Failed to update requirement');
+      if (error.response) {
+        setError(error.response.data.message || 'Something went wrong');
+      } else {
+        setError('Network error. Please try again.');
+      }
     }
-  };
-
-  // Handle input changes
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setRequirementData({
-      ...requirementData,
-      [name]: value,
-    });
   };
 
   if (loading) {
@@ -65,28 +68,27 @@ const UpdateRequirement = () => {
   }
 
   return (
-    <div className="update-requirement"> 
-      <h1>Update Requirement</h1> 
+    <div className="requirement-specification">
+      <h1>Update Requirement</h1>
       <form className="requirement-form" onSubmit={handleSubmit}>
         <div className="form-group">
-          <label htmlFor="requirement_name">Requirement Statement</label>
+          <label htmlFor="requirementStatement">Requirement Statement</label>
           <input
             type="text"
-            id="requirement_name"
-            name="requirement_name"
-            value={requirementData.requirement_name} 
-            onChange={handleChange}
+            id="requirementStatement"
+            value={requirementStatement}
+            onChange={(e) => setRequirementStatement(e.target.value)}
             placeholder="Enter requirement statement"
             required
           />
         </div>
         <div className="form-group">
-          <label htmlFor="requirement_type">Type</label>
+          <label htmlFor="requirementType">Type</label>
           <select
-            id="requirement_type"
-            name="requirement_type"
-            value={requirementData.requirement_type}
-            onChange={handleChange}
+            id="requirementType"
+            value={requirementType}
+            onChange={(e) => setRequirementType(e.target.value)}
+            required
           >
             <option value="" disabled>Select Type</option>
             <option value="Functional">Functionality</option>
@@ -95,36 +97,33 @@ const UpdateRequirement = () => {
             <option value="Reliability">Reliability</option>
             <option value="Maintenance">Maintenance</option>
             <option value="Portability">Portability</option>
-            <option value="Limitations Design and construction">
-              Limitations Design and construction
-            </option>
+            <option value="Limitations Design and construction">Limitations Design and construction</option>
             <option value="Interoperability">Interoperability</option>
-            <option value="Non-Functional">Reusability</option>
-            <option value="Non-Functional">Legal and regulative</option>
+            <option value="Reusability">Reusability</option>
+            <option value="Legal and regulative">Legal and regulative</option>
           </select>
         </div>
         <div className="form-group">
-          <label htmlFor="requirement_description">Description</label>
+          <label htmlFor="description">Description</label>
           <textarea
-            id="requirement_description"
-            name="requirement_description"
-            value={requirementData.requirement_description}
-            onChange={handleChange}
+            id="description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
             placeholder="Enter requirement description"
             rows="4"
             required
           ></textarea>
         </div>
         <div className="form-buttons">
-          <button type="submit" className="btn btn-primary">
-            Update
-          </button>
           <button
             type="button"
             className="btn btn-back"
-            onClick={() => navigate('/Dashboard')}
+            onClick={() => navigate(`/Dashboard?project_id=${projectId}`, { state: { selectedSection: 'Requirement' } })}
           >
-            Back to Dashboard
+            Back to Requirements
+          </button>
+          <button type="submit" className="btn btn-primary">
+            Update
           </button>
         </div>
       </form>

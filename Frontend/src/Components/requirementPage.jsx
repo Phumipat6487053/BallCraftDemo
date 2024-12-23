@@ -1,32 +1,67 @@
 import React, { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPen, faTrash, faPlus, faCheckSquare, faFileUpload } from "@fortawesome/free-solid-svg-icons";
+import { faPen, faTrash, faPlus, faCheckSquare, faFileUpload, faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import "./CSS/RequirementPage.css";
 
 const RequirementPage = () => {
   const [requirementList, setRequirementList] = useState([]);
   const [selectedRequirements, setSelectedRequirements] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
-  const [file, setFile] = useState(null); // สำหรับการอัปโหลดไฟล์
+  const [error, setError] = useState(null);
+  const [projectName, setProjectName] = useState(""); // State for project name
   const navigate = useNavigate();
+  const location = useLocation();
 
-  // Fetch requirements on initial load
+  // Get project_id from query
+  const queryParams = new URLSearchParams(location.search);
+  const projectId = queryParams.get("project_id");
+
   useEffect(() => {
-    axios
-      .get("http://localhost:3001/requirement")
-      .then((res) => {
-        setRequirementList(res.data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.log(err);
-        setLoading(false);
-      });
-  }, []);
+    if (projectId) {
+      setLoading(true);
 
-  // Handle select/deselect requirement
+      // Fetch project name
+      axios
+        .get(`http://localhost:3001/project/${projectId}`)
+        .then((res) => {
+          setProjectName(res.data.project_name);
+        })
+        .catch((err) => {
+          console.error("Error fetching project name:", err);
+          setError("Failed to load project name. Please try again.");
+        });
+
+      // Fetch requirements from the project
+      axios
+        .get(`http://localhost:3001/project/${projectId}/requirement`)
+        .then((res) => {
+          // Add default status "WORKING" to all requirements
+          const updatedRequirements = res.data.map((requirement) => ({
+            ...requirement,
+            status: "WORKING", // Default status
+          }));
+          setRequirementList(updatedRequirements);
+          setLoading(false);
+        })
+        .catch((err) => {
+          console.error("Error fetching requirements:", err);
+          setError("Failed to load requirements. Please try again.");
+          setLoading(false);
+        });
+    }
+  }, [projectId]);
+
+  // Filter requirements based on search query
+  const filteredRequirements = requirementList.filter((requirement) =>
+    requirement.requirement_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    requirement.requirement_type.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    requirement.requirement_description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    `REQ-00${requirement.requirement_id}`.toLowerCase().includes(searchQuery.toLowerCase()) // Filter by ID
+  );
+
   const handleSelectRequirement = (id) => {
     setSelectedRequirements((prev) =>
       prev.includes(id)
@@ -35,7 +70,6 @@ const RequirementPage = () => {
     );
   };
 
-  // Handle delete with confirmation
   const handleDelete = (requirementId) => {
     if (window.confirm("Are you sure you want to delete this requirement?")) {
       axios
@@ -52,50 +86,19 @@ const RequirementPage = () => {
     }
   };
 
-  // Handle file upload
-  const handleFileUpload = (e) => {
-    setFile(e.target.files[0]);
-  };
-
-  const handleUploadSubmit = () => {
-    if (file) {
-      const formData = new FormData();
-      formData.append("file", file);
-      axios
-        .post("http://localhost:3001/upload", formData)
-        .then((res) => {
-          console.log("File uploaded successfully:", res.data);
-          setFile(null);
-        })
-        .catch((err) => {
-          console.error("Error uploading file:", err);
-        });
-    } else {
-      alert("Please select a file to upload.");
-    }
-  };
-
-  //จัดให้ตัวหนังสือมันห่างๆกันหน่อย
   return (
     <div className="requirement-container">
       <div className="top-section">
-        <h1 className="requirement-title">Requirements</h1>
+        <h1 className="requirement-title">Project {projectName || projectId} Requirements</h1>
         <div className="action-buttons">
-
-        <button className="review-button"
-          onClick={() => navigate("/ReviewReqVeri")}
-          >
+          <button className="review-button" onClick={() => navigate("/ReviewReqVeri")}>
             <FontAwesomeIcon icon={faCheckSquare} /> Review Verification
           </button>
-
-          <button className="verify-button"
-          onClick={() => navigate("/ReqVerification")}
-          >
+          <button className="verify-button" onClick={() => navigate("/ReqVerification")}>
             <FontAwesomeIcon icon={faCheckSquare} /> Verification
           </button>
-          
           <button
-            onClick={() => navigate("/CreateRequirement")}
+            onClick={() => navigate(`/CreateRequirement?project_id=${projectId}`)}
             className="add-requirement-button"
           >
             <FontAwesomeIcon icon={faPlus} /> Add Requirements
@@ -103,63 +106,70 @@ const RequirementPage = () => {
         </div>
       </div>
 
+      {/* Search section */}
+      <div className="req-search">
+        <input
+          type="text"
+          className="req-search-input"
+          placeholder="Search Requirement"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        <FontAwesomeIcon icon={faMagnifyingGlass} className="search-icon-req" />
+      </div>
+
+      {/* Content section */}
       <div className="content-container">
         {loading ? (
           <p>Loading requirements...</p>
+        ) : error ? (
+          <p className="error-message">{error}</p>
+        ) : filteredRequirements.length === 0 ? (
+          <p>No requirements available for this project.</p>
         ) : (
           <table className="requirement-table">
             <thead>
               <tr>
                 <th>Select</th>
                 <th>ID</th>
-                <th>Description</th>
+                <th>Name</th>
                 <th>Type</th>
+                <th>Description</th>
                 <th>Actions</th>
                 <th>Status</th>
               </tr>
             </thead>
             <tbody>
-              {requirementList.length === 0 ? (
-                <tr>
-                  <td colSpan="6">No requirements available</td>
+              {filteredRequirements.map((data) => (
+                <tr key={data.requirement_id}>
+                  <td>
+                    <input
+                      type="checkbox"
+                      checked={selectedRequirements.includes(data.requirement_id)}
+                      onChange={() => handleSelectRequirement(data.requirement_id)}
+                    />
+                  </td>
+                  <td>REQ-00{data.requirement_id}</td>
+                  <td>{data.requirement_name}</td>
+                  <td>{data.requirement_type}</td>
+                  <td>{data.requirement_description}</td>
+                  <td>
+                    <button
+                      onClick={() => navigate(`/UpdateRequirement?project_id=${projectId}`)}
+                      className="action-button edit-req"
+                    >
+                      <FontAwesomeIcon icon={faPen} className="action-icon" />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(data.requirement_id)}
+                      className="action-button delete-req"
+                    >
+                      <FontAwesomeIcon icon={faTrash} className="action-icon" />
+                    </button>
+                  </td>
+                  <td>{data.status}</td>
                 </tr>
-              ) : (
-                requirementList.map((data) => (
-                  <tr key={data.requirement_id}>
-                    <td>
-                      <input
-                        type="checkbox"
-                        checked={selectedRequirements.includes(
-                          data.requirement_id
-                        )}
-                        onChange={() =>
-                          handleSelectRequirement(data.requirement_id)
-                        }
-                      />
-                    </td>
-                    <td>{data.requirement_id}</td>
-                    <td>{data.requirement_description}</td>
-                    <td>{data.requirement_type}</td>
-                    <td>
-                      <button
-                        onClick={() =>
-                          navigate(`/UpdateRequirement/${data.requirement_id}`)
-                        }
-                        className="edit-req"
-                      >
-                        <FontAwesomeIcon icon={faPen} className="edit-icon" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(data.requirement_id)}
-                        className="delete-req"
-                      >
-                        <FontAwesomeIcon icon={faTrash} className="trash-icon" />
-                      </button>
-                    </td>
-                    
-                  </tr>
-                ))
-              )}
+              ))}
             </tbody>
           </table>
         )}
@@ -167,10 +177,9 @@ const RequirementPage = () => {
 
       {/* File Upload Section */}
       <div className="file-upload-section">
-        <h3>File</h3>
+        <h3>Upload File</h3>
         <div className="file-upload-container">
-          <input type="file" onChange={handleFileUpload} className="file-input" />
-          <button onClick={handleUploadSubmit} className="upload-button">
+          <button className="upload-button">
             <FontAwesomeIcon icon={faFileUpload} /> Add File
           </button>
         </div>

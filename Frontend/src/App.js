@@ -10,6 +10,7 @@ import Navbar from './Components/Navbar';
 import Dashboard from './Components/Dashboard';
 import UpdateProject from './Components/UpdateProject';
 import Home from './Components/Home';
+import TryToReq from './Components/TryToReq';
 
 const App = () => {
   return (
@@ -31,8 +32,10 @@ const App = () => {
         {/* Routes for Requirements */}
         <Route path="/requirementPage" element={<RequirementPage />} />
         <Route path="/CreateRequirement" element={<CreateRequirement />} />
-        <Route path="/UpdateRequirement/:id" element={<UpdateRequirement />} />
+        <Route path="/UpdateRequirement" element={<UpdateRequirement />} />
         <Route path="/req-verification" element={<ReqVerification />} />
+
+        <Route path="/TryToReq" element={<TryToReq />} />
       </Routes>
     </Router>
   );

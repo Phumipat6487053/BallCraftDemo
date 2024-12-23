@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+import axios from 'axios';
 
 import './CSS/Dashboard.css';
 import RequirementPage from './RequirementPage';
@@ -7,10 +8,40 @@ import RequirementPage from './RequirementPage';
 const Dashboard = () => {
   const location = useLocation();
   const [selectedSection, setSelectedSection] = useState(localStorage.getItem('selectedSection') || 'Overview');
+  const [projectName, setProjectName] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
+  // ดึง project_id จาก query params ใน URL
   const queryParams = new URLSearchParams(location.search);
-  const projectName = queryParams.get('project');
+  const projectId = queryParams.get('project_id');  // ตรวจสอบว่าใช้ 'project_id'
+  useEffect(() => {
+    if (location.state && location.state.selectedSection) {
+      setSelectedSection(location.state.selectedSection);  // อัปเดต selectedSection จาก state ที่ส่งมา
+    }
+  }, [location.state]);
 
+  // ใช้ useEffect เพื่อดึงข้อมูลโปรเจค
+  useEffect(() => {
+    if (projectId) {
+      setLoading(true);
+
+      // หา project name จาก project_id
+      axios
+        .get(`http://localhost:3001/project/${projectId}`)
+        .then((res) => {
+          setProjectName(res.data.project_name);
+          setLoading(false);
+        })
+        .catch((err) => {
+          console.error("Error fetching project name:", err);
+          setError("Failed to load project name. Please try again.");
+          setLoading(false);
+        });
+    }
+  }, [projectId]);
+
+  // เก็บการเลือก section ใน localStorage
   useEffect(() => {
     localStorage.setItem('selectedSection', selectedSection);
   }, [selectedSection]);
@@ -20,7 +51,7 @@ const Dashboard = () => {
       {/* Sidebar */}
       <nav className="sidebar">
         {/* Project Name */}
-        {projectName && <div className="sidebar-project-name">{projectName}</div>}
+        {projectName && <div className="sidebar-project-name">{projectName || projectId}</div>}
 
         {/* Project Section */}
         <div className="sidebar-section-title">PROJECT</div>
@@ -58,7 +89,7 @@ const Dashboard = () => {
           Implementation
         </div>
         <div
-          className={`nav-link ${selectedSection === 'Test case' ? 'active' : ''}`}
+          className={`nav-link ${selectedSection === 'Testcase' ? 'active' : ''}`}
           onClick={() => setSelectedSection('Testcase')}
         >
           Test case
@@ -94,15 +125,24 @@ const Dashboard = () => {
 
       {/* Main Content Section */}
       <div className="content-container">
-        {selectedSection === 'Overview' && <h2>Overview Content</h2>}
-        {selectedSection === 'Documentation' && <h2>Documentation Content</h2>}
-        {selectedSection === 'Requirement' && <RequirementPage />}
-        {selectedSection === 'Design' && <h2>Design</h2>}
-        {selectedSection === 'Implementation' && <h2>Implementation</h2>}
-        {selectedSection === 'Testcase' && <h2>Test case</h2>}
-        {selectedSection === 'Review' && <h2>Review</h2>}
-        {selectedSection === 'Baseline' && <h2>Baseline</h2>}
-        {selectedSection === 'Traceability' && <h2>Traceability</h2>}
+        {loading ? (
+          <h2>Loading project details...</h2>
+        ) : error ? (
+          <h2>{error}</h2>
+        ) : (
+          <>
+            {selectedSection === 'Overview' && <h2>Overview Content</h2>}
+            {selectedSection === 'Documentation' && <h2>Documentation Content</h2>}
+            {selectedSection === 'Requirement' && <RequirementPage />}
+            {selectedSection === 'Design' && <h2>Design Content</h2>}
+            {selectedSection === 'Implementation' && <h2>Implementation Content</h2>}
+            {selectedSection === 'Testcase' && <h2>Test Case Content</h2>}
+            {selectedSection === 'Review' && <h2>Review Content</h2>}
+            {selectedSection === 'Baseline' && <h2>Baseline Content</h2>}
+            {selectedSection === 'Traceability' && <h2>Traceability Content</h2>}
+            {selectedSection === 'Guide Tutorial' && <h2>Guide Tutorial Content</h2>}
+          </>
+        )}
       </div>
     </div>
   );
