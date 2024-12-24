@@ -11,11 +11,10 @@ const RequirementPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [projectName, setProjectName] = useState(""); // State for project name
+  const [projectName, setProjectName] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Get project_id from query
   const queryParams = new URLSearchParams(location.search);
   const projectId = queryParams.get("project_id");
 
@@ -38,10 +37,9 @@ const RequirementPage = () => {
       axios
         .get(`http://localhost:3001/project/${projectId}/requirement`)
         .then((res) => {
-          // Add default status "WORKING" to all requirements
           const updatedRequirements = res.data.map((requirement) => ({
             ...requirement,
-            status: "WORKING", // Default status
+            status: "WORKING",
           }));
           setRequirementList(updatedRequirements);
           setLoading(false);
@@ -54,21 +52,22 @@ const RequirementPage = () => {
     }
   }, [projectId]);
 
-  // Filter requirements based on search query
   const filteredRequirements = requirementList.filter((requirement) =>
     requirement.requirement_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     requirement.requirement_type.toLowerCase().includes(searchQuery.toLowerCase()) ||
     requirement.requirement_description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    `REQ-00${requirement.requirement_id}`.toLowerCase().includes(searchQuery.toLowerCase()) // Filter by ID
+    `REQ-00${requirement.requirement_id}`.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleSelectRequirement = (id) => {
+    const selectedRequirement = requirementList.find(req => req.requirement_id === id);
     setSelectedRequirements((prev) =>
-      prev.includes(id)
-        ? prev.filter((reqId) => reqId !== id)
-        : [...prev, id]
+      prev.some((req) => req.requirement_id === id)
+        ? prev.filter((req) => req.requirement_id !== id)
+        : [...prev, selectedRequirement]
     );
   };
+
 
   const handleDelete = (requirementId) => {
     if (window.confirm("Are you sure you want to delete this requirement?")) {
@@ -86,6 +85,14 @@ const RequirementPage = () => {
     }
   };
 
+  const handleFileUpload = (e) => {
+    // Handle file upload logic here
+  };
+
+  const handleUploadSubmit = () => {
+    // Handle file submit logic here
+  };
+
   return (
     <div className="requirement-container">
       <div className="top-section">
@@ -94,7 +101,12 @@ const RequirementPage = () => {
           <button className="review-button" onClick={() => navigate("/ReviewReqVeri")}>
             <FontAwesomeIcon icon={faCheckSquare} /> Review Verification
           </button>
-          <button className="verify-button" onClick={() => navigate("/ReqVerification")}>
+          <button
+            className="verify-button"
+            onClick={() =>
+              navigate("/ReqVerification", { state: { selectedRequirements } })
+            }
+          >
             <FontAwesomeIcon icon={faCheckSquare} /> Verification
           </button>
           <button
@@ -106,7 +118,6 @@ const RequirementPage = () => {
         </div>
       </div>
 
-      {/* Search section */}
       <div className="req-search">
         <input
           type="text"
@@ -118,7 +129,6 @@ const RequirementPage = () => {
         <FontAwesomeIcon icon={faMagnifyingGlass} className="search-icon-req" />
       </div>
 
-      {/* Content section */}
       <div className="content-container">
         {loading ? (
           <p>Loading requirements...</p>
@@ -145,7 +155,7 @@ const RequirementPage = () => {
                   <td>
                     <input
                       type="checkbox"
-                      checked={selectedRequirements.includes(data.requirement_id)}
+                      checked={selectedRequirements.some((req) => req.requirement_id === data.requirement_id)}
                       onChange={() => handleSelectRequirement(data.requirement_id)}
                     />
                   </td>
@@ -177,9 +187,10 @@ const RequirementPage = () => {
 
       {/* File Upload Section */}
       <div className="file-upload-section">
-        <h3>Upload File</h3>
+        <h3>File</h3>
         <div className="file-upload-container">
-          <button className="upload-button">
+          <input type="file" onChange={handleFileUpload} className="file-input" />
+          <button onClick={handleUploadSubmit} className="upload-button">
             <FontAwesomeIcon icon={faFileUpload} /> Add File
           </button>
         </div>

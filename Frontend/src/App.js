@@ -16,7 +16,6 @@ const App = () => {
   return (
     <Router>
       <Navbar />
-
       <Routes>
         {/* Route for Project listing */}
         <Route path="/" element={<Home />} />
@@ -33,7 +32,7 @@ const App = () => {
         <Route path="/requirementPage" element={<RequirementPage />} />
         <Route path="/CreateRequirement" element={<CreateRequirement />} />
         <Route path="/UpdateRequirement" element={<UpdateRequirement />} />
-        <Route path="/req-verification" element={<ReqVerification />} />
+        <Route path="/ReqVerification" element={<ReqVerification />} />
 
         <Route path="/TryToReq" element={<TryToReq />} />
       </Routes>

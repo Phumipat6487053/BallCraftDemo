@@ -1,36 +1,30 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import './CSS/UpdateRequirement.css';
-import { useNavigate, useParams } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import axios from "axios";
+import "./CSS/UpdateRequirement.css";
 
 const UpdateRequirement = () => {
-  const [requirementStatement, setRequirementStatement] = useState('');
-  const [requirementType, setRequirementType] = useState('');
-  const [description, setDescription] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [requirementStatement, setRequirementStatement] = useState("");
+  const [requirementType, setRequirementType] = useState("");
+  const [description, setDescription] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
+  const location = useLocation();
   const queryParams = new URLSearchParams(window.location.search);
-  const projectId = queryParams.get('project_id'); // รับค่า project_id จาก query params
+  const projectId = queryParams.get("project_id");
 
-  // ดึงข้อมูล requirement ที่จะอัปเดตจาก backend
+  const requirement = location.state?.requirement;
+
   useEffect(() => {
-    axios
-      .get(`http://localhost:3001/requirement/${projectId}`)
-      .then((res) => {
-        setRequirementStatement(res.data.requirement_name);
-        setRequirementType(res.data.requirement_type);
-        setDescription(res.data.requirement_description);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error('Error fetching requirement data:', err);
-        setError('Failed to fetch requirement data');
-        setLoading(false);
-      });
-  }, [projectId]);
+    if (requirement) {
+      setRequirementStatement(requirement.requirement_name);
+      setRequirementType(requirement.requirement_type);
+      setDescription(requirement.requirement_description);
+    } else {
+      setError("Requirement data not found. Please go back and try again.");
+    }
+  }, [requirement]);
 
-  // การส่งข้อมูลไปที่ backend เพื่ออัปเดต requirement
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -38,34 +32,25 @@ const UpdateRequirement = () => {
       requirement_name: requirementStatement,
       requirement_type: requirementType,
       requirement_description: description,
-      project_id: projectId, // ส่ง projectId ไปด้วย
     };
 
     try {
-      const response = await axios.put(`http://localhost:3001/requirement/${projectId}`, updatedRequirement);
+      const response = await axios.put(
+        `http://localhost:3001/requirement/${requirement.requirement_id}`,
+        updatedRequirement
+      );
 
       if (response.status === 200) {
-        alert('Requirement updated successfully');
+        alert("Requirement updated successfully");
         navigate(`/Dashboard?project_id=${projectId}`, {
-          state: { selectedSection: 'Requirement' }, // เลือก section Requirement
+          state: { selectedSection: "Requirement" },
         });
-      } else {
-        console.error("Failed to update requirement:", response);
-        alert('Failed to update requirement');
       }
     } catch (error) {
-      console.error('Error updating requirement:', error);
-      if (error.response) {
-        setError(error.response.data.message || 'Something went wrong');
-      } else {
-        setError('Network error. Please try again.');
-      }
+      console.error("Error updating requirement:", error);
+      setError("Failed to update requirement. Please try again.");
     }
   };
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
 
   return (
     <div className="requirement-specification">
@@ -78,7 +63,6 @@ const UpdateRequirement = () => {
             id="requirementStatement"
             value={requirementStatement}
             onChange={(e) => setRequirementStatement(e.target.value)}
-            placeholder="Enter requirement statement"
             required
           />
         </div>
@@ -90,17 +74,15 @@ const UpdateRequirement = () => {
             onChange={(e) => setRequirementType(e.target.value)}
             required
           >
-            <option value="" disabled>Select Type</option>
+            <option value="" disabled>
+              Select Type
+            </option>
             <option value="Functional">Functionality</option>
             <option value="User interface">User interface</option>
             <option value="External interfaces">External interfaces</option>
             <option value="Reliability">Reliability</option>
             <option value="Maintenance">Maintenance</option>
             <option value="Portability">Portability</option>
-            <option value="Limitations Design and construction">Limitations Design and construction</option>
-            <option value="Interoperability">Interoperability</option>
-            <option value="Reusability">Reusability</option>
-            <option value="Legal and regulative">Legal and regulative</option>
           </select>
         </div>
         <div className="form-group">
@@ -109,7 +91,6 @@ const UpdateRequirement = () => {
             id="description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="Enter requirement description"
             rows="4"
             required
           ></textarea>
@@ -118,7 +99,11 @@ const UpdateRequirement = () => {
           <button
             type="button"
             className="btn btn-back"
-            onClick={() => navigate(`/Dashboard?project_id=${projectId}`, { state: { selectedSection: 'Requirement' } })}
+            onClick={() =>
+              navigate(`/Dashboard?project_id=${projectId}`, {
+                state: { selectedSection: "Requirement" }, // แสดงข้อมูล req
+              })
+            }
           >
             Back to Requirements
           </button>
@@ -127,6 +112,7 @@ const UpdateRequirement = () => {
           </button>
         </div>
       </form>
+      {error && <p className="error-message">{error}</p>}
     </div>
   );
 };

@@ -1,20 +1,20 @@
+/* โครงสร้างหลัก */
 .requirement-container {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  grid-gap: 20px;
   width: 100%;
   margin: 20px;
   font-family: 'Arial', sans-serif;
   color: #333;
 }
 
-
-.requirement-title {
-  font-size: 2em;
-  font-weight: bold;
-  color: #005daa;
-  /* สี Topic-project */
-  margin-bottom: 20px;
+/* ปุ่มใน top-section */
+.top-section .action-buttons {
+  display: flex;
+  justify-content: flex-end; /* จัดปุ่มไปทางขวา */
 }
 
-/* ปุ่มใน top-section */
 .top-section .action-buttons button {
   margin: 0 10px;
   padding: 10px 20px;
@@ -30,12 +30,25 @@
   background-color: #005daa;
 }
 
+/* กล่องตาราง */
+.requirement-table-container {
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  overflow-x: auto; /* เพิ่มความสามารถในการเลื่อนตารางถ้าเกินขอบ */
+}
+
 /* ตาราง */
 .requirement-table {
   width: 100%;
+  padding: 20px;
   border-collapse: collapse;
-  margin-top: 20px;
+  margin: 0;
   font-size: 0.9em;
+  border-radius: 5px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  overflow-x: auto;
 }
 
 .requirement-table th,
@@ -54,15 +67,13 @@
   background-color: #f9f9f9;
 }
 
-
-
-/* ฟอร์มอัปโหลดไฟล์ */
+/* กล่องอัปโหลดไฟล์ */
 .file-upload-section {
-  margin-top: 20px;
-  padding: 15px;
   background-color: #f9f9f9;
+  padding: 15px;
   border-radius: 5px;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  margin-top: 0; /* ไม่มีระยะห่างด้านบน */
 }
 
 .file-upload-container {
@@ -91,7 +102,7 @@
   background-color: #005daa;
 }
 
-
+/* ปุ่ม Action */
 .action-button {
   background: none;
   border: none;
@@ -105,7 +116,6 @@
   transition: all 0.3s ease;
 }
 
-
 .action-icon {
   font-size: 18px;
   color: #555;
@@ -117,15 +127,15 @@
 }
 
 .edit-req .action-icon {
-  color: #4caf50;
+  color: #4caf50; /* สีเขียวสำหรับการแก้ไข */
 }
 
 .delete-req .action-icon {
-  color: #f44336;
+  color: #f44336; /* สีแดงสำหรับการลบ */
 }
 
 .action-button:active {
-  transform: scale(0.98);
+  transform: scale(0.98); /* เอฟเฟกต์ขณะกดปุ่ม */
 }
 
 .requirement-table td,
@@ -133,6 +143,7 @@
   padding: 10px 15px;
 }
 
+/* กล่องค้นหา */
 .req-search {
   position: relative;
   margin-top: 30px;
@@ -153,7 +164,7 @@
 }
 
 .req-search-input:focus {
-  border-color: #007bff;
+  border-color: #007bff; /* เปลี่ยนสีเส้นขอบเมื่อโฟกัส */
 }
 
 .search-icon-req {
@@ -162,5 +173,5 @@
   top: 50%;
   transform: translateY(-50%);
   font-size: 1.2rem;
-  color: #888;
+  color: #888; /* สีของไอคอนค้นหา */
 }

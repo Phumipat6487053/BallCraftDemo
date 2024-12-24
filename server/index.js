@@ -257,16 +257,80 @@ app.get('/project/:id/requirement', (req, res) => {
     });
 });
 
-
-// ------------------------- Files Requirement -------------------------
-app.get("/file_requirement", (req, res) => {
-    const sql = "SELECT filereq_id, filereq_name, filereq_data FROM file_requirement";
-    db.query(sql, (err, results) => {
+// ------------------------- Requirement Verification -------------------------
+// Fetch all criteria
+app.get('/reqcriteria', (req, res) => {
+    const sql = "SELECT * FROM requirementcriteria";
+    db.query(sql, (err, result) => {
         if (err) {
-            console.error("Error fetching file_requirement:", err);
-            return res.status(500).send("Error fetching file.");
+            console.error('Error fetching Requirement Criteria:', err);
+            return res.status(500).send('Error fetching Requirement Criteria');
         }
-        res.json(results);
+        res.json(result);
+    });
+});
+
+// Add new criteria
+app.post('/reqcriteria', (req, res) => {
+    const { reqcri_name } = req.body;
+
+    if (!reqcri_name || reqcri_name.trim() === "") {
+        return res.status(400).json({ message: "Criteria name is required" });
+    }
+
+    const sql = "INSERT INTO requirementcriteria (reqcri_name) VALUES (?)";
+    db.query(sql, [reqcri_name], (err, result) => {
+        if (err) {
+            console.error('Error creating criteria:', err);
+            return res.status(500).json({ message: "Error creating criteria" });
+        }
+        res.status(201).json({ message: "Criteria created successfully", data: result });
+    });
+});
+
+// Update criteria
+app.put('/reqcriteria/:id', (req, res) => {
+    const { reqcri_name } = req.body;
+    const { id } = req.params;
+
+    if (!reqcri_name || reqcri_name.trim() === "") {
+        return res.status(400).json({ message: "Criteria name is required" });
+    }
+
+    const sql = "UPDATE requirementcriteria SET reqcri_name = ? WHERE reqcri_id = ?";
+    db.query(sql, [reqcri_name, id], (err, result) => {
+        if (err) {
+            console.error('Error updating criteria:', err);
+            return res.status(500).json({ message: "Error updating criteria" });
+        }
+        res.status(200).json({ message: "Criteria updated successfully", data: result });
+    });
+});
+
+// Delete criteria
+app.delete('/reqcriteria/:id', (req, res) => {
+    const { id } = req.params;
+
+    const checkSql = "SELECT * FROM requirementcriteria WHERE reqcri_id = ?";
+    const deleteSql = "DELETE FROM requirementcriteria WHERE reqcri_id = ?";
+
+    db.query(checkSql, [id], (err, result) => {
+        if (err) {
+            console.error('Error checking criteria:', err);
+            return res.status(500).json({ message: "Error checking criteria" });
+        }
+
+        if (result.length === 0) {
+            return res.status(404).json({ message: "Criteria not found" });
+        }
+
+        db.query(deleteSql, [id], (err, result) => {
+            if (err) {
+                console.error('Error deleting criteria:', err);
+                return res.status(500).json({ message: "Error deleting criteria" });
+            }
+            res.status(200).json({ message: "Criteria deleted successfully" });
+        });
     });
 });
 
